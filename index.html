@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unit 1 Grammar</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --color-primary: #4F46E5;
+    --color-secondary: #06B6D4;
+    --color-accent: #F59E0B;
+    --color-bg: #F8FAFC;
+    --color-card: #FFFFFF;
+    --color-correct: #22C55E;
+    --color-wrong: #EF4444;
+    --color-selecting: #2563EB;
+    --color-pending: #FEF3C7;
+    --color-pending-text: #92400E;
+}
+
+body {
+    font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif;
+    background-color: var(--color-bg);
+    margin: 0;
+    padding: 20px;
+    color: #1E293B;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+h1 {
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    h1 { font-size: 20px; }
+}
+
+.progress-bar-container {
+    width: 100%;
+    background-color: #E2E8F0;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 10px;
+    background-color: var(--color-primary);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.progress-text {
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 20px;
+}
+
+.card {
+    background-color: var(--color-card);
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: all 0.2s;
+}
+
+.question {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.6;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 600px) {
+    .question { font-size: 20px; }
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.option-btn {
+    width: 100%;
+    text-align: left;
+    padding: 14px 20px;
+    min-height: 52px;
+    font-size: 19px;
+    font-weight: 500;
+    line-height: 1.6;
+    border: 2px solid #E2E8F0;
+    border-radius: 12px;
+    background-color: #FFF;
+    cursor: pointer;
+    transition: all 0.2s;
+    overflow-wrap: break-word;
+    font-family: inherit;
+    display: flex;
+    align-items: flex-start;
+}
+
+@media (max-width: 600px) {
+    .option-btn { font-size: 17px; }
+}
+
+.option-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    border-color: var(--color-selecting);
+}
+
+.option-btn.pending {
+    background-color: var(--color-pending);
+    color: var(--color-pending-text);
+    border-color: var(--color-pending-text);
+    transform: scale(1.02);
+}
+
+.option-btn.correct {
+    background-color: var(--color-correct);
+    color: #FFF;
+    border-color: var(--color-correct);
+}
+
+.option-btn.wrong {
+    background-color: var(--color-wrong);
+    color: #FFF;
+    border-color: var(--color-wrong);
+    animation: shake 0.1s ease-in-out 2;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+    100% { transform: translateX(0); }
+}
+
+.option-label {
+    font-weight: 700;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+
+.check-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  float: right;
+  font-family: inherit;
+}
+
+
+@media (max-width: 600px) {
+    .check-btn {
+  margin-top: 20px;
+  padding: 12px 24px;
+  font-size: 17px;
+  font-weight: 600;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  float: right;
+  font-family: inherit;
+}
+
+}
+
+
+
+.explanation {
+    margin-top: 20px;
+    padding: 16px;
+    background-color: #F1F5F9;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1.8;
+    display: none;
+}
+
+@media (max-width: 600px) {
+    .explanation { font-size: 16px; }
+}
+
+.submit-btn {
+  width: 100%;
+  max-width: 400px;
+  margin: 30px auto;
+  display: block;
+  padding: 15px 40px;
+  font-size: 20px;
+  font-weight: 700;
+  background: var(--color-correct);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(34,197,94,0.3);
+  font-family: inherit;
+}
+
+
+.summary-table-container {
+    overflow-x: auto;
+    margin-top: 30px;
+    display: none;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+th, td {
+    border: 1px solid #E2E8F0;
+    text-align: center;
+    padding: 8px;
+    font-size: 14px;
+}
+
+@media (max-width: 600px) {
+    th, td { font-size: 13px; padding: 6px 4px; }
+}
+
+td.correct-cell {
+    background-color: var(--color-correct);
+    color: white;
+}
+
+td.wrong-cell {
+    background-color: var(--color-wrong);
+    color: white;
+}
+
+td.empty-cell, th.empty-cell {
+    background-color: var(--color-wrong);
+    color: white;
+}
+
+.neutral-cell {
+    background-color: #F1F5F9;
+    color: #64748B;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    align-items: center;
+    justify-content: center;
+}
+.modal-content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 16px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+}
+.modal h2 {
+    margin-top: 0;
+}
+.modal button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.student-info {
+    background-color: var(--color-card);
+    border-radius: 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+.student-info input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #E2E8F0;
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>link2</h1>
+    
+    <div class="student-info">
+        <label for="student-name" style="font-weight: 600; display: block; margin-bottom: 8px;">Họ và tên học sinh:</label>
+        <input type="text" id="student-name" placeholder="Nhập tên của bạn...">
+    </div>
+
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progress-bar"></div>
+    </div>
+    <div class="progress-text" id="progress-text">0 / X câu</div>
+
+    <div id="quiz-container"></div>
+
+    <button class="submit-btn" id="submit-btn">Nộp bài</button>
+
+    <div id="summary-container" class="summary-table-container">
+        <h2 id="congrats-text" style="text-align: center; display: none; color: var(--color-correct);">🎉 Chúc mừng bạn đã làm đúng 100%! 🎉</h2>
+        <div id="tables-wrapper"></div>
+    </div>
+</div>
+
+<div id="result-modal" class="modal">
+    <div class="modal-content">
+        <h2>Kết quả</h2>
+        <p id="score-text" style="font-size: 24px; font-weight: 700; color: var(--color-primary);"></p>
+        <p id="feedback-text" style="font-size: 16px; margin-top: 10px;"></p>
+        <button id="close-modal-btn">Xem chi tiết</button>
+    </div>
+</div>
+
+<iframe name="hidden_iframe" id="hidden_iframe" style="display:none;"></iframe>
+
+<script>
+const quizData = [
+{
+  id: 1, type: "grammar",
+  questionHTML: "<b>Section F - Complete using the correct form of the words in the box.</b><br>Everyone (1) ______ that humans have been flying for only a few hundred years.",
+  options: [{label: "A", html: "knows", isCorrect: true}, {label: "B", html: "knew", isCorrect: false}, {label: "C", html: "knowing", isCorrect: false}, {label: "D", html: "know", isCorrect: false}],
+  explanationHTML: "<p>A. knows</p><p>B. knew</p><p>C. knowing</p><p>D. know</p><p>Dịch: Mọi người biết rằng con người mới chỉ bay được vài trăm năm.</p><p>Giải thích: 'Everyone' là đại từ bất định, động từ chia số ít (knows).</p><p>Các đáp án khác sai về sự hoà hợp chủ vị hoặc sai thì.</p>"
+},
+{
+  id: 2, type: "grammar",
+  questionHTML: "But (2) ______ it possible that ancient civilizations also had the ability and technology to fly?",
+  options: [{label: "A", html: "is", isCorrect: true}, {label: "B", html: "was", isCorrect: false}, {label: "C", html: "are", isCorrect: false}, {label: "D", html: "be", isCorrect: false}],
+  explanationHTML: "<p>A. is</p><p>B. was</p><p>C. are</p><p>D. be</p><p>Dịch: Nhưng liệu có khả năng rằng các nền văn minh cổ đại cũng có khả năng và công nghệ để bay không?</p><p>Giải thích: Hiện tại đơn dùng để hỏi về một khả năng ở hiện tại. Chủ ngữ 'it' dùng 'is'.</p><p>Các đáp án khác sai sự hòa hợp chủ vị hoặc sai thì.</p>"
+},
+{
+  id: 3, type: "grammar",
+  questionHTML: "In the Nazcan Desert in southern Peru, there are hundreds of lines which an ancient culture drew in the dust. On the ground, they just (3) ______ like straight lines.",
+  options: [{label: "A", html: "look", isCorrect: true}, {label: "B", html: "looks", isCorrect: false}, {label: "C", html: "looking", isCorrect: false}, {label: "D", html: "looked", isCorrect: false}],
+  explanationHTML: "<p>A. look</p><p>B. looks</p><p>C. looking</p><p>D. looked</p><p>Dịch: Trên mặt đất, chúng chỉ trông giống như những đường thẳng.</p><p>Giải thích: Diễn tả sự thật ở hiện tại, chủ ngữ số nhiều 'they' dùng 'look'.</p><p>Các đáp án khác sai dạng, sai thì hoặc chia động từ sai.</p>"
+},
+{
+  id: 4, type: "grammar",
+  questionHTML: "But when you (4) ______ them from the air,",
+  options: [{label: "A", html: "see", isCorrect: true}, {label: "B", html: "saw", isCorrect: false}, {label: "C", html: "seeing", isCorrect: false}, {label: "D", html: "seen", isCorrect: false}],
+  explanationHTML: "<p>A. see</p><p>B. saw</p><p>C. seeing</p><p>D. seen</p><p>Dịch: Nhưng khi bạn nhìn chúng từ trên không,</p><p>Giải thích: Mệnh đề trạng ngữ chỉ thời gian với 'when' chia hiện tại đơn vì mệnh đề chính cũng ở hiện tại.</p><p>Các đáp án khác sai thì hoặc sai dạng động từ.</p>"
+},
+{
+  id: 5, type: "grammar",
+  questionHTML: "you (5) ______ exactly what they are.",
+  options: [{label: "A", html: "understand", isCorrect: true}, {label: "B", html: "understands", isCorrect: false}, {label: "C", html: "understood", isCorrect: false}, {label: "D", html: "understanding", isCorrect: false}],
+  explanationHTML: "<p>A. understand</p><p>B. understands</p><p>C. understood</p><p>D. understanding</p><p>Dịch: bạn sẽ hiểu chính xác chúng là gì.</p><p>Giải thích: Động từ đi với chủ ngữ 'you' ở hiện tại đơn.</p><p>Các đáp án khác sai sự hòa hợp chủ vị hoặc sai dạng động từ.</p>"
+},
+{
+  id: 6, type: "grammar",
+  questionHTML: "They are incredible and enormous pictures. The pictures (6) ______ animals, birds and symbols.",
+  options: [{label: "A", html: "include", isCorrect: true}, {label: "B", html: "includes", isCorrect: false}, {label: "C", html: "included", isCorrect: false}, {label: "D", html: "including", isCorrect: false}],
+  explanationHTML: "<p>A. include</p><p>B. includes</p><p>C. included</p><p>D. including</p><p>Dịch: Những bức tranh này bao gồm động vật, chim và các biểu tượng.</p><p>Giải thích: Sự thật ở hiện tại. Chủ ngữ số nhiều 'The pictures' dùng động từ nguyên mẫu 'include'.</p><p>Các đáp án khác sai chia động từ hoặc sai thì.</p>"
+},
+{
+  id: 7, type: "grammar",
+  questionHTML: "One bizarre theory, which most mainstream scientists (7) ______ with, is that the people who made the lines thousands and thousands of years ago flew above the lines in balloons.",
+  options: [{label: "A", html: "disagree", isCorrect: true}, {label: "B", html: "disagrees", isCorrect: false}, {label: "C", html: "disagreed", isCorrect: false}, {label: "D", html: "disagreeing", isCorrect: false}],
+  explanationHTML: "<p>A. disagree</p><p>B. disagrees</p><p>C. disagreed</p><p>D. disagreeing</p><p>Dịch: Một giả thuyết kỳ lạ, mà hầu hết các nhà khoa học chính thống không đồng tình, là...</p><p>Giải thích: Mệnh đề quan hệ thì hiện tại, 'scientists' là số nhiều nên động từ 'disagree' không thêm 's'.</p><p>Các đáp án khác sai chia động từ.</p>"
+},
+{
+  id: 8, type: "grammar",
+  questionHTML: "It (8) ______ incredible,",
+  options: [{label: "A", html: "seems", isCorrect: true}, {label: "B", html: "seem", isCorrect: false}, {label: "C", html: "seemed", isCorrect: false}, {label: "D", html: "seeming", isCorrect: false}],
+  explanationHTML: "<p>A. seems</p><p>B. seem</p><p>C. seemed</p><p>D. seeming</p><p>Dịch: Điều đó có vẻ khó tin,</p><p>Giải thích: Chủ ngữ 'it' chia động từ thêm 's' ở thì hiện tại đơn.</p><p>Các đáp án khác sai chia động từ hoặc thì.</p>"
+},
+{
+  id: 9, type: "grammar",
+  questionHTML: "but a few people (9) ______ believe it's possible.",
+  options: [{label: "A", html: "do", isCorrect: true}, {label: "B", html: "did", isCorrect: false}, {label: "C", html: "doing", isCorrect: false}, {label: "D", html: "done", isCorrect: false}],
+  explanationHTML: "<p>A. do</p><p>B. did</p><p>C. doing</p><p>D. done</p><p>Dịch: nhưng một số ít người vẫn tin rằng điều đó là có thể.</p><p>Giải thích: Dùng trợ động từ 'do' để nhấn mạnh động từ 'believe' ở thì hiện tại đơn.</p><p>Các đáp án khác sai cấu trúc ngữ pháp.</p>"
+},
+
+{
+  id: 10, type: "grammar",
+  questionHTML: "<b>Section G - Match to make sentences.</b><br>1. I think ...",
+  options: [{label: "A", html: "I'm going to buy the new Racetrack CD.", isCorrect: true}, {label: "B", html: "of getting Dad a CD for his birthday.", isCorrect: false}, {label: "C", html: "for his glasses. Have you seen them?", isCorrect: false}, {label: "D", html: "like he needs a holiday!", isCorrect: false}],
+  explanationHTML: "<p>A. I'm going to buy the new Racetrack CD.</p><p>B. of getting Dad a CD for his birthday.</p><p>C. for his glasses. Have you seen them?</p><p>D. like he needs a holiday!</p><p>Dịch: Tôi nghĩ tôi sẽ mua đĩa CD Racetrack mới.</p><p>Giải thích: 'think' (nghĩ) chỉ quan điểm ở hiện tại, kết hợp vế A hợp lý nhất.</p><p>Các đáp án khác không phù hợp về ngữ pháp và ý nghĩa.</p>"
+},
+{
+  id: 11, type: "grammar",
+  questionHTML: "2. I'm thinking ...",
+  options: [{label: "A", html: "of getting Dad a CD for his birthday.", isCorrect: true}, {label: "B", html: "I'm going to buy the new Racetrack CD.", isCorrect: false}, {label: "C", html: "for his glasses. Have you seen them?", isCorrect: false}, {label: "D", html: "like he needs a holiday!", isCorrect: false}],
+  explanationHTML: "<p>A. of getting Dad a CD for his birthday.</p><p>B. I'm going to buy the new Racetrack CD.</p><p>C. for his glasses. Have you seen them?</p><p>D. like he needs a holiday!</p><p>Dịch: Tôi đang cân nhắc việc mua cho Bố một đĩa CD nhân ngày sinh nhật.</p><p>Giải thích: 'think of doing sth' có nghĩa là cân nhắc việc gì đó.</p><p>Các đáp án khác sai cấu trúc.</p>"
+},
+{
+  id: 12, type: "grammar",
+  questionHTML: "3. Phil's looking ...",
+  options: [{label: "A", html: "for his glasses. Have you seen them?", isCorrect: true}, {label: "B", html: "like he needs a holiday!", isCorrect: false}, {label: "C", html: "darker hair than her sister.", isCorrect: false}, {label: "D", html: "a haircut at the moment.", isCorrect: false}],
+  explanationHTML: "<p>A. for his glasses. Have you seen them?</p><p>B. like he needs a holiday!</p><p>C. darker hair than her sister.</p><p>D. a haircut at the moment.</p><p>Dịch: Phil đang tìm kính của anh ấy. Bạn có thấy chúng không?</p><p>Giải thích: 'look for' nghĩa là tìm kiếm. Việc tìm kiếm đang diễn ra (is looking).</p><p>Các đáp án khác không hợp nghĩa.</p>"
+},
+{
+  id: 13, type: "grammar",
+  questionHTML: "4. Phil looks ...",
+  options: [{label: "A", html: "like he needs a holiday!", isCorrect: true}, {label: "B", html: "for his glasses. Have you seen them?", isCorrect: false}, {label: "C", html: "darker hair than her sister.", isCorrect: false}, {label: "D", html: "a haircut at the moment.", isCorrect: false}],
+  explanationHTML: "<p>A. like he needs a holiday!</p><p>B. for his glasses. Have you seen them?</p><p>C. darker hair than her sister.</p><p>D. a haircut at the moment.</p><p>Dịch: Phil trông có vẻ như anh ấy cần một kỳ nghỉ!</p><p>Giải thích: 'look like + mệnh đề' nghĩa là trông có vẻ như thế nào.</p><p>Các đáp án khác sai cấu trúc hoặc ngữ nghĩa.</p>"
+},
+{
+  id: 14, type: "grammar",
+  questionHTML: "5. Claire has ...",
+  options: [{label: "A", html: "darker hair than her sister.", isCorrect: true}, {label: "B", html: "a haircut at the moment.", isCorrect: false}, {label: "C", html: "not old enough to drive a car.", isCorrect: false}, {label: "D", html: "very annoying at the moment!", isCorrect: false}],
+  explanationHTML: "<p>A. darker hair than her sister.</p><p>B. a haircut at the moment.</p><p>C. not old enough to drive a car.</p><p>D. very annoying at the moment!</p><p>Dịch: Claire có mái tóc tối màu hơn em gái mình.</p><p>Giải thích: 'have' mang nghĩa sở hữu (không dùng tiếp diễn).</p><p>Các đáp án khác sai cấu trúc và ý nghĩa.</p>"
+},
+{
+  id: 15, type: "grammar",
+  questionHTML: "6. Claire is having ...",
+  options: [{label: "A", html: "a haircut at the moment.", isCorrect: true}, {label: "B", html: "darker hair than her sister.", isCorrect: false}, {label: "C", html: "not old enough to drive a car.", isCorrect: false}, {label: "D", html: "very annoying at the moment!", isCorrect: false}],
+  explanationHTML: "<p>A. a haircut at the moment.</p><p>B. darker hair than her sister.</p><p>C. not old enough to drive a car.</p><p>D. very annoying at the moment!</p><p>Dịch: Claire đang đi cắt tóc lúc này.</p><p>Giải thích: 'have a haircut' là cụm từ diễn tả hành động, có thể dùng tiếp diễn.</p><p>Các đáp án khác không phù hợp.</p>"
+},
+{
+  id: 16, type: "grammar",
+  questionHTML: "7. Andy is ...",
+  options: [{label: "A", html: "not old enough to drive a car.", isCorrect: true}, {label: "B", html: "very annoying at the moment!", isCorrect: false}, {label: "C", html: "I'm going to buy the new Racetrack CD.", isCorrect: false}, {label: "D", html: "of getting Dad a CD for his birthday.", isCorrect: false}],
+  explanationHTML: "<p>A. not old enough to drive a car.</p><p>B. very annoying at the moment!</p><p>C. I'm going to buy the new Racetrack CD.</p><p>D. of getting Dad a CD for his birthday.</p><p>Dịch: Andy chưa đủ lớn để lái xe hơi.</p><p>Giải thích: 'be + tính từ' chỉ trạng thái thường xuyên.</p><p>Các đáp án khác sai nghĩa.</p>"
+},
+{
+  id: 17, type: "grammar",
+  questionHTML: "8. Andy is being ...",
+  options: [{label: "A", html: "very annoying at the moment!", isCorrect: true}, {label: "B", html: "not old enough to drive a car.", isCorrect: false}, {label: "C", html: "I'm going to buy the new Racetrack CD.", isCorrect: false}, {label: "D", html: "of getting Dad a CD for his birthday.", isCorrect: false}],
+  explanationHTML: "<p>A. very annoying at the moment!</p><p>B. not old enough to drive a car.</p><p>C. I'm going to buy the new Racetrack CD.</p><p>D. of getting Dad a CD for his birthday.</p><p>Dịch: Andy đang tỏ ra rất phiền phức vào lúc này!</p><p>Giải thích: 'is being + adj' diễn tả cách cư xử bất thường tạm thời.</p><p>Các đáp án khác sai ý nghĩa.</p>"
+},
+{
+  id: 18, type: "grammar",
+  questionHTML: "<b>Section H - Find the extra word in each line.</b><br>1. I've been <b>to</b> travelling round Europe all summer.",
+  options: [{label: "A", html: "to", isCorrect: true}, {label: "B", html: "been", isCorrect: false}, {label: "C", html: "all", isCorrect: false}, {label: "D", html: "round", isCorrect: false}],
+  explanationHTML: "<p>A. to</p><p>B. been</p><p>C. all</p><p>D. round</p><p>Dịch: Tôi đã đi du lịch vòng quanh châu Âu cả mùa hè.</p><p>Giải thích: Cấu trúc hiện tại hoàn thành tiếp diễn là 'have been V-ing'. Từ 'to' là thừa.</p><p>Các từ khác là bắt buộc để câu có nghĩa.</p>"
+},
+{
+  id: 19, type: "grammar",
+  questionHTML: "2. It's the first time I've ever been <b>going</b> abroad,",
+  options: [{label: "A", html: "going", isCorrect: true}, {label: "B", html: "ever", isCorrect: false}, {label: "C", html: "been", isCorrect: false}, {label: "D", html: "abroad", isCorrect: false}],
+  explanationHTML: "<p>A. going</p><p>B. ever</p><p>C. been</p><p>D. abroad</p><p>Dịch: Đây là lần đầu tiên tôi đi nước ngoài,</p><p>Giải thích: Cấu trúc 'It's the first time' đi với hiện tại hoàn thành 'have been abroad', không dùng tiếp diễn ở đây. 'going' là từ thừa.</p><p>Các từ khác đúng ngữ pháp.</p>"
+},
+{
+  id: 20, type: "grammar",
+  questionHTML: "3. and I have <b>to</b> also made loads of new friends.",
+  options: [{label: "A", html: "to", isCorrect: true}, {label: "B", html: "also", isCorrect: false}, {label: "C", html: "made", isCorrect: false}, {label: "D", html: "loads", isCorrect: false}],
+  explanationHTML: "<p>A. to</p><p>B. also</p><p>C. made</p><p>D. loads</p><p>Dịch: và tôi cũng đã kết bạn với rất nhiều người mới.</p><p>Giải thích: Hiện tại hoàn thành 'have made', không có 'to' ở giữa. 'to' là thừa.</p><p>Các từ khác đứng đúng vị trí.</p>"
+},
+{
+  id: 21, type: "grammar",
+  questionHTML: "4. I've <b>been</b> decided to stay in touch with them",
+  options: [{label: "A", html: "been", isCorrect: true}, {label: "B", html: "decided", isCorrect: false}, {label: "C", html: "stay", isCorrect: false}, {label: "D", html: "touch", isCorrect: false}],
+  explanationHTML: "<p>A. been</p><p>B. decided</p><p>C. stay</p><p>D. touch</p><p>Dịch: Tôi đã quyết định giữ liên lạc với họ</p><p>Giải thích: Động từ 'decide' chia hiện tại hoàn thành chủ động 'have decided', không dùng bị động 'have been decided'. 'been' là thừa.</p><p>Các từ khác đúng cấu trúc.</p>"
+},
+{
+  id: 22, type: "grammar",
+  questionHTML: "5. She was <b>making</b> on holiday too.",
+  options: [{label: "A", html: "making", isCorrect: true}, {label: "B", html: "was", isCorrect: false}, {label: "C", html: "on", isCorrect: false}, {label: "D", html: "holiday", isCorrect: false}],
+  explanationHTML: "<p>A. making</p><p>B. was</p><p>C. on</p><p>D. holiday</p><p>Dịch: Cô ấy cũng đang đi nghỉ.</p><p>Giải thích: 'be on holiday' là đi nghỉ, không cần dùng từ 'making'. 'making' là thừa.</p><p>Các từ khác đúng.</p>"
+},
+{
+  id: 23, type: "grammar",
+  questionHTML: "6. We now send text messages <b>are</b> to each other all the time.",
+  options: [{label: "A", html: "are", isCorrect: true}, {label: "B", html: "send", isCorrect: false}, {label: "C", html: "text", isCorrect: false}, {label: "D", html: "each", isCorrect: false}],
+  explanationHTML: "<p>A. are</p><p>B. send</p><p>C. text</p><p>D. each</p><p>Dịch: Bây giờ chúng tôi thường xuyên gửi tin nhắn cho nhau.</p><p>Giải thích: Câu đã có động từ chính 'send', việc thêm 'are' là sai ngữ pháp. 'are' là thừa.</p><p>Các từ khác đúng ngữ pháp.</p>"
+},
+{
+  id: 24, type: "grammar",
+  questionHTML: "7. I'm planning to <b>have</b> visit her in France",
+  options: [{label: "A", html: "have", isCorrect: true}, {label: "B", html: "planning", isCorrect: false}, {label: "C", html: "visit", isCorrect: false}, {label: "D", html: "in", isCorrect: false}],
+  explanationHTML: "<p>A. have</p><p>B. planning</p><p>C. visit</p><p>D. in</p><p>Dịch: Tôi đang lên kế hoạch đến thăm cô ấy ở Pháp</p><p>Giải thích: 'plan to do sth', động từ 'visit' dùng nguyên mẫu, không cần 'have' phía trước. 'have' là thừa.</p><p>Các từ khác hợp lệ.</p>"
+},
+{
+  id: 25, type: "grammar",
+  questionHTML: "8. I <b>am</b> love meeting people from other countries!",
+  options: [{label: "A", html: "am", isCorrect: true}, {label: "B", html: "love", isCorrect: false}, {label: "C", html: "meeting", isCorrect: false}, {label: "D", html: "other", isCorrect: false}],
+  explanationHTML: "<p>A. am</p><p>B. love</p><p>C. meeting</p><p>D. other</p><p>Dịch: Tôi rất thích gặp gỡ mọi người từ các quốc gia khác!</p><p>Giải thích: Động từ 'love' dùng ở thì hiện tại đơn, chủ ngữ 'I' không cần to-be 'am' đi kèm. 'am' là thừa.</p><p>Các từ khác cần thiết cho câu.</p>"
+},
+{
+  id: 26, type: "grammar",
+  questionHTML: "9. I want to have <b>had</b> lots of friends from all over the world!",
+  options: [{label: "A", html: "had", isCorrect: true}, {label: "B", html: "want", isCorrect: false}, {label: "C", html: "have", isCorrect: false}, {label: "D", html: "lots", isCorrect: false}],
+  explanationHTML: "<p>A. had</p><p>B. want</p><p>C. have</p><p>D. lots</p><p>Dịch: Tôi muốn có rất nhiều bạn bè từ khắp nơi trên thế giới!</p><p>Giải thích: Cấu trúc là 'want to have sth', nên từ 'had' bị thừa ở đây.</p><p>Các từ khác là thành phần chính của câu.</p>"
+},
+{
+  id: 27, type: "grammar",
+  questionHTML: "10. but it also <b>is</b> broadens your circle of friends!",
+  options: [{label: "A", html: "is", isCorrect: true}, {label: "B", html: "also", isCorrect: false}, {label: "C", html: "broadens", isCorrect: false}, {label: "D", html: "circle", isCorrect: false}],
+  explanationHTML: "<p>A. is</p><p>B. also</p><p>C. broadens</p><p>D. circle</p><p>Dịch: nhưng nó cũng mở rộng vòng kết nối bạn bè của bạn!</p><p>Giải thích: Động từ chính 'broadens' chia ở hiện tại đơn, không cần động từ to-be 'is'. 'is' là thừa.</p><p>Các từ khác đúng.</p>"
+},
+{
+  id: 28, type: "grammar",
+  questionHTML: "<b>Section I - Write one word in each gap.</b><br>'You've (1) ______ looking at that timetable for the last ten minutes. It can't be that confusing!' said Sheila angrily.",
+  options: [{label: "A", html: "been", isCorrect: true}, {label: "B", html: "be", isCorrect: false}, {label: "C", html: "being", isCorrect: false}, {label: "D", html: "was", isCorrect: false}],
+  explanationHTML: "<p>A. been</p><p>B. be</p><p>C. being</p><p>D. was</p><p>Dịch: 'Bạn đã nhìn vào thời gian biểu đó trong suốt mười phút qua. Nó không thể rắc rối đến thế!' Sheila giận dữ nói.</p><p>Giải thích: Thì hiện tại hoàn thành tiếp diễn 'have/has + been + V-ing'. Chọn 'been'.</p><p>Các đáp án khác sai cấu trúc ngữ pháp.</p>"
+},
+{
+  id: 29, type: "grammar",
+  questionHTML: "'I (2) ______ wish you'd be quiet!",
+  options: [{label: "A", html: "do", isCorrect: true}, {label: "B", html: "did", isCorrect: false}, {label: "C", html: "does", isCorrect: false}, {label: "D", html: "doing", isCorrect: false}],
+  explanationHTML: "<p>A. do</p><p>B. did</p><p>C. does</p><p>D. doing</p><p>Dịch: 'Tôi thực sự ước bạn sẽ im lặng!</p><p>Giải thích: Dùng trợ động từ 'do' để nhấn mạnh động từ 'wish' ở hiện tại.</p><p>Các đáp án khác sai thì hoặc sai sự hòa hợp chủ vị.</p>"
+},
+{
+  id: 30, type: "grammar",
+  questionHTML: "I've (3) ______ a splitting headache thanks to you!' replied Matt.",
+  options: [{label: "A", html: "got", isCorrect: true}, {label: "B", html: "get", isCorrect: false}, {label: "C", html: "getting", isCorrect: false}, {label: "D", html: "had", isCorrect: false}],
+  explanationHTML: "<p>A. got</p><p>B. get</p><p>C. getting</p><p>D. had</p><p>Dịch: Tôi bị đau đầu như búa bổ nhờ bạn đấy!' Matt trả lời.</p><p>Giải thích: 'have got' = 'have' (có bị gì). Cấu trúc 'have got a headache'.</p><p>Các đáp án khác không phù hợp trong cấu trúc 'have got'.</p>"
+},
+{
+  id: 31, type: "grammar",
+  questionHTML: "'Mum! Dad! Please!' said Alison. 'You're both (4) ______ very silly.",
+  options: [{label: "A", html: "being", isCorrect: true}, {label: "B", html: "been", isCorrect: false}, {label: "C", html: "be", isCorrect: false}, {label: "D", html: "are", isCorrect: false}],
+  explanationHTML: "<p>A. being</p><p>B. been</p><p>C. be</p><p>D. are</p><p>Dịch: 'Mẹ! Bố! Xin hãy thôi đi!' Alison nói. 'Cả hai người đang hành xử rất ngớ ngẩn.</p><p>Giải thích: 'are being + adj' diễn tả hành vi nhất thời. Chọn 'being'.</p><p>Các đáp án khác sai dạng từ.</p>"
+},
+{
+  id: 32, type: "grammar",
+  questionHTML: "(5) ______ is no point at all in blaming each other.",
+  options: [{label: "A", html: "There", isCorrect: true}, {label: "B", html: "It", isCorrect: false}, {label: "C", html: "Here", isCorrect: false}, {label: "D", html: "This", isCorrect: false}],
+  explanationHTML: "<p>A. There</p><p>B. It</p><p>C. Here</p><p>D. This</p><p>Dịch: Đổ lỗi cho nhau chẳng có ích lợi gì cả.</p><p>Giải thích: Cấu trúc 'There is no point in + V-ing' nghĩa là làm gì đó cũng vô ích.</p><p>Các đáp án khác không đúng cấu trúc thành ngữ này.</p>"
+},
+{
+  id: 33, type: "grammar",
+  questionHTML: "That's not going to help us find out what time the next train to Budapest is due to leave.' 'You (6) ______ quite right, darling.",
+  options: [{label: "A", html: "are", isCorrect: true}, {label: "B", html: "is", isCorrect: false}, {label: "C", html: "were", isCorrect: false}, {label: "D", html: "be", isCorrect: false}],
+  explanationHTML: "<p>A. are</p><p>B. is</p><p>C. were</p><p>D. be</p><p>Dịch: Điều đó sẽ không giúp chúng ta biết chuyến tàu tiếp theo tới Budapest mấy giờ rời đi.' 'Con hoàn toàn đúng, con yêu.</p><p>Giải thích: 'You' đi với động từ to-be 'are' ở hiện tại.</p><p>Các đáp án khác sai thì hoặc sai dạng.</p>"
+},
+{
+  id: 34, type: "grammar",
+  questionHTML: "I (7) ______ sorry,' said Sheila.",
+  options: [{label: "A", html: "am", isCorrect: true}, {label: "B", html: "was", isCorrect: false}, {label: "C", html: "be", isCorrect: false}, {label: "D", html: "are", isCorrect: false}],
+  explanationHTML: "<p>A. am</p><p>B. was</p><p>C. be</p><p>D. are</p><p>Dịch: Mẹ xin lỗi,' Sheila nói.</p><p>Giải thích: 'I am sorry'.</p><p>Các đáp án khác sai cấu trúc cơ bản.</p>"
+},
+{
+  id: 35, type: "grammar",
+  questionHTML: "'Me too,' mumbled Matt. 'Now, let's have another look at this timetable. Well, it (8) ______ like we",
+  options: [{label: "A", html: "looks", isCorrect: true}, {label: "B", html: "look", isCorrect: false}, {label: "C", html: "looking", isCorrect: false}, {label: "D", html: "looked", isCorrect: false}],
+  explanationHTML: "<p>A. looks</p><p>B. look</p><p>C. looking</p><p>D. looked</p><p>Dịch: 'Bố cũng vậy,' Matt lầm bầm. 'Bây giờ, chúng ta hãy xem lại lịch trình này. Chà, có vẻ như chúng ta</p><p>Giải thích: 'it looks like' (có vẻ như là). Chủ ngữ số ít 'it' nên động từ thêm 's'.</p><p>Các đáp án khác chia sai động từ.</p>"
+},
+{
+  id: 36, type: "grammar",
+  questionHTML: "(9) ______ definitely missed the last train today. That was the 18.20 we just missed, wasn't it?'",
+  options: [{label: "A", html: "have", isCorrect: true}, {label: "B", html: "has", isCorrect: false}, {label: "C", html: "had", isCorrect: false}, {label: "D", html: "having", isCorrect: false}],
+  explanationHTML: "<p>A. have</p><p>B. has</p><p>C. had</p><p>D. having</p><p>Dịch: chắc chắn đã lỡ chuyến tàu cuối cùng ngày hôm nay.</p><p>Giải thích: Thì hiện tại hoàn thành, chủ ngữ 'we' đi với 'have'.</p><p>Các đáp án khác sai thì hoặc chia sai.</p>"
+},
+{
+  id: 37, type: "grammar",
+  questionHTML: "'I (10) ______ so,' said Sheila. 'I mean, it did leave at 18.20.",
+  options: [{label: "A", html: "think", isCorrect: true}, {label: "B", html: "thought", isCorrect: false}, {label: "C", html: "thinking", isCorrect: false}, {label: "D", html: "thinks", isCorrect: false}],
+  explanationHTML: "<p>A. think</p><p>B. thought</p><p>C. thinking</p><p>D. thinks</p><p>Dịch: 'Mẹ nghĩ vậy,' Sheila nói. 'Ý mẹ là, nó thực sự rời đi lúc 18.20.</p><p>Giải thích: 'I think so' (Tôi nghĩ vậy) dùng để bày tỏ sự đồng tình ở hiện tại.</p><p>Các đáp án khác sai cấu trúc ngữ pháp.</p>"
+},
+{
+  id: 38, type: "grammar",
+  questionHTML: "Whether it's actually going to Budapest or not is another question.' 'Well, one thing is (11) ______ in doubt,' said Matt.",
+  options: [{label: "A", html: "not", isCorrect: true}, {label: "B", html: "no", isCorrect: false}, {label: "C", html: "none", isCorrect: false}, {label: "D", html: "never", isCorrect: false}],
+  explanationHTML: "<p>A. not</p><p>B. no</p><p>C. none</p><p>D. never</p><p>Dịch: Liệu nó có thực sự đi đến Budapest hay không lại là chuyện khác.' 'Chà, có một điều không thể nghi ngờ,' Matt nói.</p><p>Giải thích: Cụm từ 'not in doubt' (không còn nghi ngờ gì nữa). Sau động từ to-be 'is' đi kèm 'not'.</p><p>Các đáp án khác không phù hợp ngữ pháp trong ngữ cảnh.</p>"
+},
+{
+  id: 39, type: "grammar",
+  questionHTML: "'What's that?' asked Sheila and Alison together. 'This is the worst holiday we've (12) ______ been on,' said Matt.",
+  options: [{label: "A", html: "ever", isCorrect: true}, {label: "B", html: "never", isCorrect: false}, {label: "C", html: "always", isCorrect: false}, {label: "D", html: "already", isCorrect: false}],
+  explanationHTML: "<p>A. ever</p><p>B. never</p><p>C. always</p><p>D. already</p><p>Dịch: 'Đó là gì?' Sheila và Alison cùng hỏi. 'Đây là kỳ nghỉ tệ nhất mà chúng ta từng trải qua,' Matt nói.</p><p>Giải thích: Trong cấu trúc so sánh nhất (the worst) đi kèm với thì hiện tại hoàn thành, chúng ta dùng 'ever' (từng).</p><p>Các đáp án khác không phù hợp với so sánh nhất.</p>"
+},
+{
+  id: 40, type: "grammar",
+  questionHTML: "<b>Section J - Complete each second sentence using the word given.</b><br>1. What's the price of the tickets, Jimmy? (much)<br>How ______________________, Jimmy?",
+  options: [{label: "A", html: "much are the tickets", isCorrect: true}, {label: "B", html: "much do the tickets cost", isCorrect: false}, {label: "C", html: "much the tickets are", isCorrect: false}, {label: "D", html: "many are the tickets", isCorrect: false}],
+  explanationHTML: "<p>A. much are the tickets</p><p>B. much do the tickets cost</p><p>C. much the tickets are</p><p>D. many are the tickets</p><p>Dịch: Giá vé là bao nhiêu vậy Jimmy? -> Những chiếc vé này bao nhiêu tiền vậy Jimmy?</p><p>Giải thích: 'What is the price of = How much is/are'. Đề bài yêu cầu dùng 2 đến 5 từ, 'much are the tickets' (4 từ) là phù hợp nhất.</p><p>Các đáp án khác sai cấu trúc câu hỏi hoặc số lượng từ.</p>"
+},
+{
+  id: 41, type: "grammar",
+  questionHTML: "2. Are these your trainers? (to)<br>Do ______________________ you?",
+  options: [{label: "A", html: "these trainers belong to", isCorrect: true}, {label: "B", html: "these trainers belong", isCorrect: false}, {label: "C", html: "they belong to", isCorrect: false}, {label: "D", html: "the trainers belong to", isCorrect: false}],
+  explanationHTML: "<p>A. these trainers belong to</p><p>B. these trainers belong</p><p>C. they belong to</p><p>D. the trainers belong to</p><p>Dịch: Đây có phải là giày thể thao của bạn không? -> Những đôi giày thể thao này có thuộc về bạn không?</p><p>Giải thích: 'belong to sb' nghĩa là thuộc về ai đó. Cấu trúc câu hỏi: 'Do these trainers belong to you?'.</p><p>Các đáp án khác thiếu 'to' hoặc đổi đại từ làm sai nghĩa gốc.</p>"
+},
+{
+  id: 42, type: "grammar",
+  questionHTML: "3. Sasha's not keen on team sports at all. (like)<br>Sasha ______________________ team sports at all.",
+  options: [{label: "A", html: "does not like", isCorrect: true}, {label: "B", html: "doesn't likes", isCorrect: false}, {label: "C", html: "is not liking", isCorrect: false}, {label: "D", html: "does not likes", isCorrect: false}],
+  explanationHTML: "<p>A. does not like</p><p>B. doesn't likes</p><p>C. is not liking</p><p>D. does not likes</p><p>Dịch: Sasha hoàn toàn không thích các môn thể thao đồng đội. -> Sasha hoàn toàn không thích các môn thể thao đồng đội.</p><p>Giải thích: 'be not keen on' = 'not like'. Động từ 'like' mượn trợ động từ 'does not' hoặc 'doesn't', sau đó động từ giữ nguyên.</p><p>Các đáp án khác sai lỗi chia động từ.</p>"
+},
+{
+  id: 43, type: "grammar",
+  questionHTML: "4. It's only her second time in a recording studio. (been)<br>She ______________________ in a recording studio once before.",
+  options: [{label: "A", html: "has only been", isCorrect: true}, {label: "B", html: "has been only", isCorrect: false}, {label: "C", html: "have only been", isCorrect: false}, {label: "D", html: "was only", isCorrect: false}],
+  explanationHTML: "<p>A. has only been</p><p>B. has been only</p><p>C. have only been</p><p>D. was only</p><p>Dịch: Đây mới chỉ là lần thứ hai cô ấy ở trong phòng thu. -> Cô ấy mới chỉ ở trong phòng thu một lần trước đây.</p><p>Giải thích: Diễn tả trải nghiệm dùng hiện tại hoàn thành 'has been'. Vị trí của 'only' nằm giữa 'has' và 'been'.</p><p>Các đáp án khác sai cấu trúc hoặc sai vị trí từ.</p>"
+},
+{
+  id: 44, type: "grammar",
+  questionHTML: "5. We got here three hours ago. (have)<br>We ______________________ three hours.",
+  options: [{label: "A", html: "have been here for", isCorrect: true}, {label: "B", html: "have been here since", isCorrect: false}, {label: "C", html: "are here for", isCorrect: false}, {label: "D", html: "had been here for", isCorrect: false}],
+  explanationHTML: "<p>A. have been here for</p><p>B. have been here since</p><p>C. are here for</p><p>D. had been here for</p><p>Dịch: Chúng tôi đã đến đây 3 tiếng trước. -> Chúng tôi đã ở đây được 3 tiếng rồi.</p><p>Giải thích: Chuyển từ quá khứ đơn (ago) sang hiện tại hoàn thành (for + khoảng thời gian). Dùng 'have been here'.</p><p>Các đáp án khác sai thì hoặc sai giới từ.</p>"
+},
+{
+  id: 45, type: "grammar",
+  questionHTML: "6. I started writing this hours ago and it's still not right. (writing)<br>I ______________________ hours and it's still not right.",
+  options: [{label: "A", html: "have been writing this for", isCorrect: true}, {label: "B", html: "have wrote this for", isCorrect: false}, {label: "C", html: "am writing this for", isCorrect: false}, {label: "D", html: "had been writing this for", isCorrect: false}],
+  explanationHTML: "<p>A. have been writing this for</p><p>B. have wrote this for</p><p>C. am writing this for</p><p>D. had been writing this for</p><p>Dịch: Tôi đã bắt đầu viết cái này từ nhiều giờ trước và nó vẫn chưa đúng. -> Tôi đã và đang viết cái này trong nhiều giờ và nó vẫn chưa đúng.</p><p>Giải thích: Hành động bắt đầu trong quá khứ và vẫn đang tiếp diễn, dùng hiện tại hoàn thành tiếp diễn 'have been writing + for'.</p><p>Các đáp án khác sai thì.</p>"
+},
+{
+  id: 46, type: "grammar",
+  questionHTML: "7. This is my first experience of flying alone. (time)<br>It is the first ______________________ alone.",
+  options: [{label: "A", html: "time I have flown", isCorrect: true}, {label: "B", html: "time I fly", isCorrect: false}, {label: "C", html: "time I am flying", isCorrect: false}, {label: "D", html: "time I flew", isCorrect: false}],
+  explanationHTML: "<p>A. time I have flown</p><p>B. time I fly</p><p>C. time I am flying</p><p>D. time I flew</p><p>Dịch: Đây là trải nghiệm bay một mình đầu tiên của tôi. -> Đây là lần đầu tiên tôi bay một mình.</p><p>Giải thích: Cấu trúc 'It's the first time + S + have/has + V3/ed'. Dùng 'have flown'.</p><p>Các đáp án khác sai thì.</p>"
+},
+{
+  id: 47, type: "grammar",
+  questionHTML: "8. Sharon's in the bath at the moment. (a)<br>Sharon ______________________ at the moment.",
+  options: [{label: "A", html: "is having a bath", isCorrect: true}, {label: "B", html: "has a bath", isCorrect: false}, {label: "C", html: "is taking a bath", isCorrect: false}, {label: "D", html: "does have a bath", isCorrect: false}],
+  explanationHTML: "<p>A. is having a bath</p><p>B. has a bath</p><p>C. is taking a bath</p><p>D. does have a bath</p><p>Dịch: Sharon đang ở trong bồn tắm lúc này. -> Sharon đang tắm lúc này.</p><p>Giải thích: 'be in the bath' tương đương với hành động 'have a bath'. Vì có 'at the moment' nên dùng thì hiện tại tiếp diễn 'is having a bath'.</p><p>Các đáp án khác sai thì hoặc không chứa từ yêu cầu ('a' có nhưng 'take' không sát nghĩa bằng cấu trúc gốc).</p>"
+},
+{
+  id: 48, type: "grammar",
+  questionHTML: "9. Paul enjoys surprises apart from on his birthday. (does)<br>Paul ______________________ surprises, just not on his birthday!",
+  options: [{label: "A", html: "does enjoy", isCorrect: true}, {label: "B", html: "does enjoys", isCorrect: false}, {label: "C", html: "do enjoy", isCorrect: false}, {label: "D", html: "did enjoy", isCorrect: false}],
+  explanationHTML: "<p>A. does enjoy</p><p>B. does enjoys</p><p>C. do enjoy</p><p>D. did enjoy</p><p>Dịch: Paul thích những điều bất ngờ, ngoại trừ vào ngày sinh nhật của anh ấy. -> Paul thực sự thích những điều bất ngờ, chỉ là không phải vào sinh nhật của anh ấy!</p><p>Giải thích: Dùng trợ động từ 'does' để nhấn mạnh động từ 'enjoy' ở thì hiện tại đơn.</p><p>Các đáp án khác sai ngữ pháp.</p>"
+}
+];
+
+let userState = {};
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(frequency, duration, type, vol=0.1) {
+    try {
+        if(audioCtx.state === 'suspended') audioCtx.resume();
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+        
+        oscillator.type = type;
+        oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        
+        gainNode.gain.setValueAtTime(vol, audioCtx.currentTime);
+        gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+        
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + duration);
+    } catch(e) {}
+}
+
+function playSelectSound() {
+    playTone(600, 0.08, 'sine', 0.15);
+}
+
+function playCorrectSound() {
+    playTone(800, 0.1, 'sine', 0.2);
+    setTimeout(() => playTone(1200, 0.15, 'sine', 0.2), 100);
+}
+
+function playWrongSound() {
+    playTone(150, 0.2, 'sawtooth', 0.12);
+}
+
+function shuffle(array) {
+    let currentIndex = array.length, randomIndex;
+    while (currentIndex !== 0) {
+        randomIndex = 0;
+        currentIndex--;
+        
+    }
+    return array;
+}
+
+function initQuiz() {
+    quizData.forEach(q => {
+        userState[q.id] = { selected: null, checked: false, isCorrect: null };
+    });
+    renderQuiz();
+}
+
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    document.getElementById('progress-text').innerText = `0 / ${quizData.length} câu`;
+    
+    quizData.forEach(q => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.id = `card-${q.id}`;
+        
+        let html = `<div class="question"><b>Câu ${q.id}:</b> ${q.questionHTML}</div>`;
+        html += `<div class="options-container" id="options-${q.id}">`;
+        
+        let shuffledOptions = [...q.options];
+        shuffle(shuffledOptions);
+        
+        let labels = ['A', 'B', 'C', 'D'];
+        shuffle(labels);
+        
+        shuffledOptions.forEach((opt, index) => {
+            const displayLabel = labels[index];
+            html += `<button class="option-btn" data-qid="${q.id}" data-orig="${opt.label}" id="btn-${q.id}-${opt.label}">
+                        <span class="option-label">${displayLabel}.</span> ${opt.html}
+                     </button>`;
+        });
+        
+        html += `</div>`;
+        html += `<button class="check-btn" id="check-${q.id}" disabled>Kiểm tra</button>`;
+        html += `<div class="explanation" id="exp-${q.id}">${q.explanationHTML}</div>`;
+        
+        card.innerHTML = html;
+        container.appendChild(card);
+    });
+    
+    document.querySelectorAll('.option-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const qid = parseInt(this.getAttribute('data-qid'));
+            const orig = this.getAttribute('data-orig');
+            
+            if(userState[qid].checked) return;
+            
+            userState[qid].selected = orig;
+            
+            document.querySelectorAll(`#options-${qid} .option-btn`).forEach(b => b.classList.remove('pending'));
+            this.classList.add('pending');
+            
+            document.getElementById(`check-${qid}`).disabled = false;
+            
+            playSelectSound();
+            updateProgress();
+        });
+    });
+    
+    document.querySelectorAll('.check-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const qid = parseInt(this.id.split('-')[1]);
+            checkAnswer(qid, true);
+        });
+    });
+}
+
+function updateProgress() {
+    let answered = 0;
+    for(let k in userState) {
+        if(userState[k].selected !== null) answered++;
+    }
+    const pct = (answered / quizData.length) * 100;
+    document.getElementById('progress-bar').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${answered} / ${quizData.length} câu`;
+}
+
+function checkAnswer(qid, playSound = false) {
+    if(userState[qid].checked) return;
+    if(userState[qid].selected === null) {
+        userState[qid].checked = true;
+        userState[qid].isCorrect = false;
+        
+        const qData = quizData.find(x => x.id === qid);
+        const correctOrig = qData.options.find(x => x.isCorrect).label;
+        document.getElementById(`btn-${qid}-${correctOrig}`).classList.add('correct');
+        
+        document.getElementById(`exp-${qid}`).style.display = 'block';
+        document.getElementById(`check-${qid}`).disabled = true;
+        document.getElementById(`check-${qid}`).style.display = 'none';
+        
+        document.querySelectorAll(`#options-${qid} .option-btn`).forEach(b => {
+            b.style.pointerEvents = 'none';
+        });
+        return;
+    }
+    
+    userState[qid].checked = true;
+    const qData = quizData.find(x => x.id === qid);
+    const correctOrig = qData.options.find(x => x.isCorrect).label;
+    
+    if(userState[qid].selected === correctOrig) {
+        userState[qid].isCorrect = true;
+        document.getElementById(`btn-${qid}-${correctOrig}`).classList.remove('pending');
+        document.getElementById(`btn-${qid}-${correctOrig}`).classList.add('correct');
+        if(playSound) playCorrectSound();
+    } else {
+        userState[qid].isCorrect = false;
+        const selectedBtn = document.getElementById(`btn-${qid}-${userState[qid].selected}`);
+        selectedBtn.classList.remove('pending');
+        selectedBtn.classList.add('wrong');
+        
+        document.getElementById(`btn-${qid}-${correctOrig}`).classList.add('correct');
+        if(playSound) playWrongSound();
+    }
+    
+    document.getElementById(`exp-${qid}`).style.display = 'block';
+    document.getElementById(`check-${qid}`).disabled = true;
+    document.getElementById(`check-${qid}`).style.display = 'none';
+    
+    document.querySelectorAll(`#options-${qid} .option-btn`).forEach(b => {
+        b.style.pointerEvents = 'none';
+    });
+}
+
+document.getElementById('submit-btn').addEventListener('click', function() {
+    this.disabled = true;
+    
+    const studentName = document.getElementById('student-name').value.trim() || 'Khách';
+    
+    let correctCount = 0;
+    quizData.forEach(q => {
+        if(!userState[q.id].checked) {
+            checkAnswer(q.id, false);
+        }
+        if(userState[q.id].isCorrect) correctCount++;
+    });
+    
+    const score = (correctCount / quizData.length * 10).toFixed(2);
+    const tile = `${correctCount}/${quizData.length}`;
+    
+    let feedback = '';
+    if(correctCount === quizData.length) feedback = 'Tuyệt vời! Bạn đạt điểm tuyệt đối!';
+    else if(correctCount >= quizData.length * 0.8) feedback = 'Rất tốt! Bạn nắm bài rất vững!';
+    else if(correctCount >= quizData.length * 0.5) feedback = 'Khá tốt! Cố gắng ôn tập thêm nhé!';
+    else feedback = 'Bạn cần cố gắng nhiều hơn. Hãy xem kỹ phần giải thích nhé!';
+    
+    document.getElementById('score-text').innerText = `Điểm: ${score} (${tile})`;
+    document.getElementById('feedback-text').innerText = feedback;
+    
+    document.getElementById('result-modal').style.display = 'flex';
+    
+    if(correctCount === quizData.length) {
+        document.getElementById('congrats-text').style.display = 'block';
+    }
+    
+    renderSummaryTable();
+    
+    let loisai = [];
+    quizData.forEach(q => {
+        if(!userState[q.id].isCorrect) {
+            loisai.push(`Câu ${q.id}: Chọn ${userState[q.id].selected || 'Bỏ trống'}`);
+        }
+    });
+    const loisaiStr = loisai.length > 0 ? loisai.join(', ') : 'Không có';
+    
+    const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSelQyzh_lWyb2vZUnQ1jc1p9FLRknDZiUt9NiUiiX1epHTFLw/formResponse?usp=pp_url&entry.351633352=link2&entry.1895948982=${encodeURIComponent(studentName)}&entry.1232319784=${score}&entry.1125920425=${encodeURIComponent(tile)}&entry.1907417670=${encodeURIComponent(loisaiStr)}`;
+    
+    const formForm = document.createElement('form');
+    formForm.action = formUrl;
+    formForm.method = 'POST';
+    formForm.target = 'hidden_iframe';
+    document.body.appendChild(formForm);
+    formForm.submit();
+});
+
+document.getElementById('close-modal-btn').addEventListener('click', function() {
+    document.getElementById('result-modal').style.display = 'none';
+    document.getElementById('summary-container').style.display = 'block';
+    document.getElementById('summary-container').scrollIntoView({ behavior: 'smooth' });
+});
+
+function renderSummaryTable() {
+    const wrapper = document.getElementById('tables-wrapper');
+    wrapper.innerHTML = '';
+    
+    const chunkSize = 20;
+    for(let i=0; i<quizData.length; i+=chunkSize) {
+        const chunk = quizData.slice(i, i+chunkSize);
+        
+        let tableHTML = '<table><tr><th>Câu</th>';
+        chunk.forEach(q => {
+            const isEmpty = userState[q.id].selected === null;
+            tableHTML += `<th class="${isEmpty ? 'empty-cell' : ''}">${q.id}</th>`;
+        });
+        tableHTML += '</tr>';
+        
+        ['A', 'B', 'C', 'D'].forEach(label => {
+            tableHTML += `<tr><td><b>${label}</b></td>`;
+            chunk.forEach(q => {
+                const correctOrig = q.options.find(x => x.isCorrect).label;
+                const userSelected = userState[q.id].selected;
+                const isEmpty = userSelected === null;
+                
+                let cellClass = 'neutral-cell';
+                if(isEmpty) {
+                    cellClass = 'empty-cell';
+                } else if(label === correctOrig) {
+                    cellClass = 'correct-cell';
+                } else if(label === userSelected && userSelected !== correctOrig) {
+                    cellClass = 'wrong-cell';
+                }
+                
+                tableHTML += `<td class="${cellClass}">${label}</td>`;
+            });
+            tableHTML += '</tr>';
+        });
+        
+        tableHTML += '</table>';
+        wrapper.innerHTML += tableHTML;
+    }
+}
+
+window.onload = initQuiz;
+
+</script>
+</body>
+</html>
