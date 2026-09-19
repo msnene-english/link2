@@ -1,1000 +1,481 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Unit 1 Grammar Quiz</title>
-<style>
-:root {
-  --color-primary: #4F46E5;
-  --color-secondary: #06B6D4;
-  --color-accent: #F59E0B;
-  --color-bg: #F8FAFC;
-  --color-card: #FFFFFF;
-  --color-correct: #22C55E;
-  --color-wrong: #EF4444;
-  --color-selecting: #2563EB;
-  --color-pending: #FEF3C7;
-  --color-pending-text: #92400E;
-  --font-main: 'Inter', -apple-system, 'Segoe UI', sans-serif;
-}
-body {
-  font-family: var(--font-main);
-  background-color: var(--color-bg);
-  background-image: radial-gradient(var(--color-primary) 1px, transparent 1px);
-  background-size: 20px 20px;
-  background-attachment: fixed;
-  color: #333;
-  margin: 0;
-  padding: 0;
-}
-.progress-bar-container {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  height: 8px;
-  background-color: #e2e8f0;
-  z-index: 1000;
-}
-.progress-bar {
-  height: 100%;
-  background-color: var(--color-primary);
-  width: 0%;
-  transition: width 0.3s ease;
-}
-.header {
-  background: white;
-  padding: 16px 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.header h1 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-}
-.progress-text {
-  font-size: 16px;
-  font-weight: 500;
-  color: #64748b;
-}
-.container {
-  max-width: 900px;
-  margin: 24px auto;
-  padding: 0 16px;
-}
-.card {
-  background: var(--color-card);
-  border-radius: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,.08);
-  padding: 24px;
-  margin-bottom: 24px;
-  overflow-wrap: break-word;
-}
-.question-html {
-  font-size: 21px;
-  font-weight: 600;
-  line-height: 1.6;
-  margin-bottom: 20px;
-}
-.question-html input[type="text"] {
-  border: 1px solid #cbd5e1;
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 18px;
-  font-family: var(--font-main);
-  width: 120px;
-  transition: all 0.2s;
-  background: white;
-}
-.question-html input[type="text"]:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
-}
-.btn {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 14px 20px;
-  font-size: 17px;
-  font-weight: 600;
-  cursor: pointer;
-  min-height: 52px;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-.btn:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
-}
-.btn:disabled {
-  background: #cbd5e1;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-.reordering-bank {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.chip {
-  background: #f1f5f9;
-  border: 1px solid #cbd5e1;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.2s;
-  user-select: none;
-}
-.chip:hover {
-  background: #e2e8f0;
-}
-.chip.used {
-  opacity: 0.5;
-  pointer-events: none;
-}
-.reordering-target {
-  min-height: 52px;
-  border: 2px dashed #cbd5e1;
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-.chip-in-target {
-  background: var(--color-primary);
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 18px;
-  cursor: pointer;
-}
-.explanation {
-  margin-top: 20px;
-  padding: 16px;
-  background: #f8fafc;
-  border-left: 4px solid var(--color-secondary);
-  border-radius: 0 8px 8px 0;
-  font-size: 17px;
-  line-height: 1.8;
-  display: none;
-}
-.correct-text { color: var(--color-correct); font-weight: bold; }
-.wrong-text { color: var(--color-wrong); text-decoration: line-through; font-weight: bold; }
-.shake {
-  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
-}
-@keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
-}
-.submit-btn-container {
-  text-align: center;
-  margin: 40px 0;
-}
-.submit-btn {
-  background: var(--color-accent);
-  padding: 16px 32px;
-  font-size: 20px;
-}
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-.modal-content {
-  background: white;
-  padding: 32px;
-  border-radius: 16px;
-  text-align: center;
-  max-width: 400px;
-  width: 90%;
-}
-#wrong-list-container {
-  display: none;
-  margin-top: 40px;
-}
-.wrong-list-title {
-  color: var(--color-wrong);
-  font-size: 24px;
-  text-align: center;
-  margin-bottom: 24px;
-}
-.textarea-container textarea {
-  width: 100%;
-  min-height: 80px;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 18px;
-  font-family: var(--font-main);
-  resize: vertical;
-}
-.textarea-container input[type="text"] {
-  width: 100%;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  padding: 12px;
-  font-size: 18px;
-  font-family: var(--font-main);
-}
-@media (max-width: 600px) {
-  .header h1 { font-size: 20px; }
-  .question-html { font-size: 20px; }
-  .question-html input[type="text"] { font-size: 17px; width: 100px; }
-  .btn { font-size: 16px; padding: 12px 16px; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>English Test - Unit 1 (Sections F-J)</title>
+    <style>
+        :root{--color-primary:#4F46E5;--color-secondary:#06B6D4;--color-accent:#F59E0B;--color-bg:#F8FAFC;--color-card:#FFFFFF;--color-correct:#22C55E;--color-wrong:#EF4444;--color-selecting:#2563EB;--color-pending:#FEF3C7;--color-pending-text:#92400E;}
+        body { font-family: 'Inter', -apple-system, 'Segoe UI', sans-serif; background-color: var(--color-bg); margin: 0; padding: 0; padding-top: 60px; color: #333; }
+        * { box-sizing: border-box; }
+        .watermark { position: fixed; top: 10px; left: 10px; z-index: 1000; font-weight: bold; color: rgba(0,0,0,0.3); pointer-events: none; }
+        .footer-watermark { text-align: center; padding: 20px; font-weight: bold; color: rgba(0,0,0,0.5); }
+        .top-bar { position: fixed; top: 0; left: 0; right: 0; height: 50px; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; align-items: center; padding: 0 20px; z-index: 999; }
+        .progress-container { flex: 1; margin: 0 20px; height: 10px; background: #E2E8F0; border-radius: 5px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--color-primary); width: 0%; transition: width 0.3s; }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .card { background: var(--color-card); border-radius: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.08); padding: 20px; margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.12); }
+        .question-text { font-size: 21px; font-weight: 600; line-height: 1.6; margin-bottom: 20px; }
+        .btn-check { display: block; width: 100%; padding: 14px 20px; background: var(--color-primary); color: white; border: none; border-radius: 8px; font-size: 17px; font-weight: 600; cursor: pointer; margin-top: 20px; min-height: 52px; }
+        .btn-check:disabled { background: #CBD5E1; cursor: not-allowed; }
+        .explanation { margin-top: 20px; padding: 15px; background: #F1F5F9; border-radius: 8px; font-size: 17px; display: none; }
+        .name-screen { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--color-bg); z-index: 2000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .name-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 90%; max-width: 400px; text-align: center; }
+        .name-input { width: 100%; padding: 12px; font-size: 18px; border: 2px solid #E2E8F0; border-radius: 8px; margin-bottom: 20px; }
+        .btn-start { background: var(--color-primary); color: white; padding: 12px 30px; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; }
+        .gap-input { font-size: 18px; padding: 4px 8px; border: 2px solid #CBD5E1; border-radius: 4px; width: 120px; text-align: center; }
+        .gap-input.pending { background: var(--color-pending); color: var(--color-pending-text); transform: scale(1.02); }
+        .gap-input.correct { background: var(--color-correct); color: white; border-color: var(--color-correct); }
+        .gap-input.wrong { background: var(--color-wrong); color: white; border-color: var(--color-wrong); animation: shake 0.2s; }
+        .chip { display: inline-block; padding: 8px 16px; margin: 4px; background: #E2E8F0; border-radius: 20px; cursor: pointer; font-size: 18px; user-select: none; }
+        .chip:hover { background: #CBD5E1; }
+        .chip.in-slot { background: var(--color-primary); color: white; }
+        .slot-area { min-height: 60px; padding: 10px; border: 2px dashed #CBD5E1; border-radius: 8px; margin-bottom: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+        .bank-area { min-height: 60px; display: flex; flex-wrap: wrap; gap: 8px; }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        .overlay { position: fixed; top:0; left:0; right:0; bottom:0; background: rgba(0,0,0,0.5); z-index: 3000; display: none; align-items: center; justify-content: center; }
+        .popup { background: white; padding: 30px; border-radius: 16px; text-align: center; max-width: 400px; width: 90%; }
+        .wrong-list { margin-top: 40px; display: none; }
+    </style>
 </head>
 <body>
-
-<div class="progress-bar-container">
-  <div class="progress-bar" id="progress-bar"></div>
-</div>
-<div class="header">
-  <h1>Unit 1 Grammar Quiz</h1>
-  <div class="progress-text" id="progress-text">0 / 20</div>
-</div>
-
-<div class="container" id="quiz-container">
-  <!-- Quiz content will be generated here -->
-</div>
-
-<div class="submit-btn-container">
-  <button class="btn submit-btn" id="submit-btn" onclick="submitQuiz()">Nộp bài</button>
-</div>
-
-<div class="container" id="wrong-list-container">
-  <h2 class="wrong-list-title">DANH SÁCH CÁC CÂU LÀM SAI</h2>
-  <div id="wrong-list-items"></div>
-  <h2 class="wrong-list-title" style="color: #64748b; margin-top: 40px;">Các câu tự luận — hãy tự đối chiếu đáp án mẫu</h2>
-  <div id="essay-list-items"></div>
-</div>
-
-<div class="modal-overlay" id="result-modal">
-  <div class="modal-content">
-    <h2 id="modal-title" style="margin-top:0;">Kết quả</h2>
-    <p id="modal-score" style="font-size: 24px; font-weight: bold; margin: 16px 0;"></p>
-    <p id="modal-feedback"></p>
-    <button class="btn" onclick="closeModal()">Đóng</button>
-  </div>
-</div>
-
-<div class="modal-overlay" id="student-info-modal" style="display:flex;">
-  <div class="modal-content">
-    <h2 style="margin-top:0;">Thông tin học sinh</h2>
-    <input type="text" id="student-name" placeholder="Nhập tên của bạn" style="width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 16px;">
-    <button class="btn" style="width: 100%;" onclick="startQuiz()">Bắt đầu làm bài</button>
-  </div>
-</div>
-
-<script>
-const quizData = [
-  {
-    "id": 1,
-    "type": "gap_fill_text",
-    "questionHTML": "<b>Điền từ:</b> Complete using the correct form of the words in the box.<br><b>be • disagree • do • include • know • look • see • seem • understand</b><br><br><b>Ancient aviators?</b><br>Everyone {{blank:b1}} that humans have been flying for only a few hundred years. But {{blank:b2}} it possible that ancient civilizations also had the ability and technology to fly?<br>In the Nazcan Desert in southern Peru, there are hundreds of lines which an ancient culture drew in the dust. On the ground, they just {{blank:b3}} like straight lines. But when you {{blank:b4}} them from the air, you {{blank:b5}} exactly what they are. They are incredible and enormous pictures. The pictures {{blank:b6}} animals, birds and symbols.<br>One bizarre theory, which most mainstream scientists {{blank:b7}} with, is that the people who made the lines thousands and thousands of years ago flew above the lines in balloons. It {{blank:b8}} incredible, but a few people {{blank:b9}} believe it's possible.",
-    "blanks": [
-      {"blankId": "b1", "correctAnswers": ["knows"]},
-      {"blankId": "b2", "correctAnswers": ["is"]},
-      {"blankId": "b3", "correctAnswers": ["look"]},
-      {"blankId": "b4", "correctAnswers": ["see"]},
-      {"blankId": "b5", "correctAnswers": ["understand"]},
-      {"blankId": "b6", "correctAnswers": ["include"]},
-      {"blankId": "b7", "correctAnswers": ["disagree"]},
-      {"blankId": "b8", "correctAnswers": ["seems"]},
-      {"blankId": "b9", "correctAnswers": ["do"]}
-    ],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành sử dụng dạng đúng của các từ trong hộp.<br><b>Giải thích chi tiết:</b><br>- <b>b1</b>: 'Everyone' là đại từ bất định số ít nên động từ 'know' chia là 'knows'. Dịch: Mọi người đều biết rằng con người mới chỉ bay được vài trăm năm.<br>- <b>b2</b>: Động từ to be đảo lên trước chủ ngữ 'it' để tạo câu hỏi, 'it' số ít nên dùng 'is'. Dịch: Nhưng liệu có thể...<br>- <b>b3</b>: 'they' số nhiều, diễn tả trạng thái hiện tại nên dùng 'look'. Dịch: Trên mặt đất, chúng chỉ trông giống như những đường thẳng.<br>- <b>b4</b>: 'you' đi với động từ nguyên thể 'see'. Dịch: Nhưng khi bạn nhìn chúng từ trên không...<br>- <b>b5</b>: 'you' đi với động từ nguyên thể 'understand'. Dịch: ...bạn sẽ hiểu chính xác chúng là gì.<br>- <b>b6</b>: 'The pictures' số nhiều, dùng 'include'. Dịch: Các bức tranh bao gồm hình động vật...<br>- <b>b7</b>: 'scientists' số nhiều, diễn tả sự không đồng tình hiện tại dùng 'disagree'. Dịch: Một lý thuyết kỳ lạ, mà hầu hết các nhà khoa học chính thống đều không đồng ý...<br>- <b>b8</b>: 'It' số ít đi với 'seems'. Dịch: Điều đó nghe có vẻ khó tin...<br>- <b>b9</b>: Dùng trợ động từ 'do' để nhấn mạnh cho động từ 'believe' với chủ ngữ 'a few people' (số nhiều). Dịch: ...nhưng một số ít người thực sự tin điều đó là có thể."
-  },
-  {
-    "id": 2,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (1)",
-    "words": [
-      {"tokenId": "t1", "text": "I think"},
-      {"tokenId": "t2", "text": "I'm going to buy the new Racetrack CD."}
-    ],
-    "correctOrder": "I think I'm going to buy the new Racetrack CD.",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 1-B. 'I think' (Tôi nghĩ) đi với mệnh đề 'I'm going to buy...' (tôi sẽ mua...)."
-  },
-  {
-    "id": 3,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (2)",
-    "words": [
-      {"tokenId": "t1", "text": "I'm thinking"},
-      {"tokenId": "t2", "text": "of getting Dad a CD for his birthday."}
-    ],
-    "correctOrder": "I'm thinking of getting Dad a CD for his birthday.",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 2-F. Cấu trúc 'think of doing something': đang cân nhắc làm gì."
-  },
-  {
-    "id": 4,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (3)",
-    "words": [
-      {"tokenId": "t1", "text": "Phil's looking"},
-      {"tokenId": "t2", "text": "for his glasses. Have you seen them?"}
-    ],
-    "correctOrder": "Phil's looking for his glasses. Have you seen them?",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 3-D. Cụm động từ 'look for': tìm kiếm."
-  },
-  {
-    "id": 5,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (4)",
-    "words": [
-      {"tokenId": "t1", "text": "Phil looks"},
-      {"tokenId": "t2", "text": "like he needs a holiday!"}
-    ],
-    "correctOrder": "Phil looks like he needs a holiday!",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 4-H. Cấu trúc 'look like + mệnh đề': trông có vẻ như."
-  },
-  {
-    "id": 6,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (5)",
-    "words": [
-      {"tokenId": "t1", "text": "Claire has"},
-      {"tokenId": "t2", "text": "darker hair than her sister."}
-    ],
-    "correctOrder": "Claire has darker hair than her sister.",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 5-A. Động từ 'has' diễn tả sở hữu (có mái tóc tối màu hơn)."
-  },
-  {
-    "id": 7,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (6)",
-    "words": [
-      {"tokenId": "t1", "text": "Claire is having"},
-      {"tokenId": "t2", "text": "a haircut at the moment."}
-    ],
-    "correctOrder": "Claire is having a haircut at the moment.",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 6-C. Cấu trúc 'have a haircut' (cắt tóc) đang xảy ra nên chia tiếp diễn 'is having'."
-  },
-  {
-    "id": 8,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (7)",
-    "words": [
-      {"tokenId": "t1", "text": "Andy is"},
-      {"tokenId": "t2", "text": "not old enough to drive a car."}
-    ],
-    "correctOrder": "Andy is not old enough to drive a car.",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 7-E. 'is' diễn tả trạng thái/tính chất (không đủ tuổi)."
-  },
-  {
-    "id": 9,
-    "type": "reordering",
-    "questionHTML": "<b>Ghép câu:</b> Match to make sentences. (8)",
-    "words": [
-      {"tokenId": "t1", "text": "Andy is being"},
-      {"tokenId": "t2", "text": "very annoying at the moment!"}
-    ],
-    "correctOrder": "Andy is being very annoying at the moment!",
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Nối để tạo thành câu.<br><b>Giải thích chi tiết:</b> Nối 8-G. 'is being' diễn tả một cách cư xử tạm thời (hiện đang tỏ ra rất phiền phức)."
-  },
-  {
-    "id": 10,
-    "type": "gap_fill_text",
-    "questionHTML": "<b>Tìm lỗi sai:</b> Find the extra word in each line.<br><br><b>International friends</b><br>1 I've been {{blank:b1}} travelling round Europe all summer. It's the first time I've<br>2 ever been {{blank:b2}} going abroad, and I've had a fantastic time! I've seen<br>3 loads of interesting places and I have {{blank:b3}} to also made loads of new friends.<br>4 I've been {{blank:b4}} decided to stay in touch with them now I'm back. One of<br>5 them, Giselle, is French. She was making {{blank:b5}} on holiday too. We now send<br>6 text messages are {{blank:b6}} to each other all the time. They're usually in English<br>7 because my French isn't very good! I'm planning to have {{blank:b7}} visit her in<br>8 France next year sometime. I hope I can. I am {{blank:b8}} love meeting people from<br>9 other countries! I want to have had {{blank:b9}} lots of friends from all over the world!<br>10 Travelling certainly broadens the mind but it also is {{blank:b10}} broadens your circle of friends!",
-    "blanks": [
-      {"blankId": "b1", "correctAnswers": ["to"]},
-      {"blankId": "b2", "correctAnswers": ["been"]},
-      {"blankId": "b3", "correctAnswers": ["to"]},
-      {"blankId": "b4", "correctAnswers": ["been"]},
-      {"blankId": "b5", "correctAnswers": ["making"]},
-      {"blankId": "b6", "correctAnswers": ["are"]},
-      {"blankId": "b7", "correctAnswers": ["have"]},
-      {"blankId": "b8", "correctAnswers": ["am"]},
-      {"blankId": "b9", "correctAnswers": ["had"]},
-      {"blankId": "b10", "correctAnswers": ["is"]}
-    ],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Tìm từ thừa trong mỗi dòng.<br><b>Giải thích chi tiết:</b><br>- <b>b1</b>: 'to' thừa vì cấu trúc là 'have been travelling' (hiện tại hoàn thành tiếp diễn).<br>- <b>b2</b>: 'been' thừa vì cấu trúc là 'have ever gone/been', ở đây có 'going' nên dùng 'have ever gone' (chỗ này văn cảnh là have gone, bỏ been).<br>- <b>b3</b>: 'to' thừa, cấu trúc hiện tại hoàn thành 'have made'.<br>- <b>b4</b>: 'been' thừa, câu chủ động 'I have decided'.<br>- <b>b5</b>: 'making' thừa, cấu trúc 'be on holiday' (đang đi nghỉ).<br>- <b>b6</b>: 'are' thừa, động từ chính là 'send'.<br>- <b>b7</b>: 'have' thừa, cấu trúc 'plan to do something' (to visit).<br>- <b>b8</b>: 'am' thừa, động từ 'love' ở hiện tại đơn.<br>- <b>b9</b>: 'had' thừa, cấu trúc 'want to have'.<br>- <b>b10</b>: 'is' thừa, động từ 'broadens' chia ở hiện tại đơn chủ động."
-  },
-  {
-    "id": 11,
-    "type": "gap_fill_text",
-    "questionHTML": "<b>Điền từ:</b> Write one word in each gap.<br><br><b>Holiday Blues</b><br>'You've {{blank:b1}} looking at that timetable for the last ten minutes. It can't be that confusing!' said Sheila angrily.<br>'I {{blank:b2}} wish you'd be quiet! I've {{blank:b3}} a splitting headache thanks to you!' replied Matt.<br>'Mum! Dad! Please!' said Alison. 'You're both {{blank:b4}} very silly. {{blank:b5}} is no point at all in blaming each other. That's not going to help us find out what time the next train to Budapest is due to leave.'<br>'You {{blank:b6}} quite right, darling. I {{blank:b7}} sorry,' said Sheila.<br>'Me too,' mumbled Matt. 'Now, let's have another look at this timetable. Well, it {{blank:b8}} like we {{blank:b9}} definitely missed the last train today. That was the 18.20 we just missed, wasn't it?'<br>'I {{blank:b10}} so,' said Sheila. 'I mean, it did leave at 18.20. Whether it's actually going to Budapest or not is another question.'<br>'Well, one thing is {{blank:b11}} in doubt,' said Matt.<br>'What's that?' asked Sheila and Alison together.<br>'This is the worst holiday we've {{blank:b12}} been on,' said Matt. 'Next year, we're going to try something far less adventurous.'<br>'Agreed!' said Sheila and Alison.",
-    "blanks": [
-      {"blankId": "b1", "correctAnswers": ["been"]},
-      {"blankId": "b2", "correctAnswers": ["do"]},
-      {"blankId": "b3", "correctAnswers": ["got"]},
-      {"blankId": "b4", "correctAnswers": ["being"]},
-      {"blankId": "b5", "correctAnswers": ["There"]},
-      {"blankId": "b6", "correctAnswers": ["are"]},
-      {"blankId": "b7", "correctAnswers": ["am"]},
-      {"blankId": "b8", "correctAnswers": ["looks"]},
-      {"blankId": "b9", "correctAnswers": ["have"]},
-      {"blankId": "b10", "correctAnswers": ["suppose", "think", "guess"]},
-      {"blankId": "b11", "correctAnswers": ["not"]},
-      {"blankId": "b12", "correctAnswers": ["ever"]}
-    ],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Viết một từ vào mỗi chỗ trống.<br><b>Giải thích chi tiết:</b><br>- <b>b1</b>: 'been' (hiện tại hoàn thành tiếp diễn: have been looking).<br>- <b>b2</b>: 'do' (nhấn mạnh động từ 'wish').<br>- <b>b3</b>: 'got' (cấu trúc 'have got' = have).<br>- <b>b4</b>: 'being' (be being + adj: đang tỏ ra/cư xử).<br>- <b>b5</b>: 'There' (cấu trúc 'There is no point in...').<br>- <b>b6</b>: 'are' (You are right).<br>- <b>b7</b>: 'am' (I am sorry).<br>- <b>b8</b>: 'looks' (it looks like).<br>- <b>b9</b>: 'have' (hiện tại hoàn thành 'have missed').<br>- <b>b10</b>: 'suppose' hoặc 'think' (I suppose/think so).<br>- <b>b11</b>: 'not' (not in doubt = không còn nghi ngờ gì).<br>- <b>b12</b>: 'ever' (cấu trúc so sánh nhất + thì hiện tại hoàn thành với 'ever')."
-  },
-  {
-    "id": 12,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>1 What's the price of the tickets, Jimmy? <b>much</b><br>How ______________________, Jimmy?",
-    "originalSentenceHTML": "How ______________________, Jimmy?",
-    "sampleAnswers": ["How much do the tickets cost, Jimmy?", "How much are the tickets, Jimmy?"],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai sử dụng từ cho sẵn sao cho nghĩa không đổi. Dùng 2 đến 5 từ.<br><b>Giải thích chi tiết:</b> 'What's the price of...' = 'How much do... cost?' hoặc 'How much are...'."
-  },
-  {
-    "id": 13,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>2 Are these your trainers? <b>to</b><br>Do ______________________ you?",
-    "originalSentenceHTML": "Do ______________________ you?",
-    "sampleAnswers": ["Do these trainers belong to you?"],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> 'be your trainers' = 'belong to you'."
-  },
-  {
-    "id": 14,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>3 Sasha's not keen on team sports at all. <b>like</b><br>Sasha ______________________ team sports at all.",
-    "originalSentenceHTML": "Sasha ______________________ team sports at all.",
-    "sampleAnswers": ["Sasha does not like team sports at all.", "Sasha doesn't like team sports at all."],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> 'be not keen on' = 'not like'."
-  },
-  {
-    "id": 15,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>4 It's only her second time in a recording studio. <b>been</b><br>She ______________________ in a recording studio once before.",
-    "originalSentenceHTML": "She ______________________ in a recording studio once before.",
-    "sampleAnswers": ["She has only been in a recording studio once before.", "She's only been in a recording studio once before."],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> Lần thứ hai làm gì = mới chỉ làm điều đó một lần trước đây ('has only been ... once before')."
-  },
-  {
-    "id": 16,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>5 We got here three hours ago. <b>have</b><br>We ______________________ three hours.",
-    "originalSentenceHTML": "We ______________________ three hours.",
-    "sampleAnswers": ["We have been here for three hours.", "We've been here for three hours."],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> Quá khứ đơn (ago) đổi sang hiện tại hoàn thành (for + khoảng thời gian)."
-  },
-  {
-    "id": 17,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>6 I started writing this hours ago and it's still not right. <b>writing</b><br>I ______________________ hours and it's still not right.",
-    "originalSentenceHTML": "I ______________________ hours and it's still not right.",
-    "sampleAnswers": ["I have been writing this for hours and it's still not right.", "I've been writing this for hours and it's still not right."],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> 'started V-ing + ago' đổi sang hiện tại hoàn thành tiếp diễn 'have been V-ing for'."
-  },
-  {
-    "id": 18,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>7 This is my first experience of flying alone. <b>time</b><br>It is the first ______________________ alone.",
-    "originalSentenceHTML": "It is the first ______________________ alone.",
-    "sampleAnswers": ["It is the first time I have flown alone.", "It is the first time I've flown alone."],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> 'first experience of V-ing' = 'the first time S + have PII'."
-  },
-  {
-    "id": 19,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>8 Sharon's in the bath at the moment. <b>a</b><br>Sharon ______________________ at the moment.",
-    "originalSentenceHTML": "Sharon ______________________ at the moment.",
-    "sampleAnswers": ["Sharon is having a bath at the moment.", "Sharon's having a bath at the moment."],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> 'be in the bath' = 'be having a bath'."
-  },
-  {
-    "id": 20,
-    "type": "sentence_rewrite",
-    "questionHTML": "<b>Viết lại câu:</b> Complete each second sentence using the word given, so that it has a similar meaning to the first sentence. Write between two and five words in each gap.<br>9 Paul enjoys surprises apart from on his birthday. <b>does</b><br>Paul ______________________ surprises, just not on his birthday!",
-    "originalSentenceHTML": "Paul ______________________ surprises, just not on his birthday!",
-    "sampleAnswers": ["Paul does enjoy surprises, just not on his birthday!"],
-    "explanationHTML": "<b>Dịch câu hỏi:</b> Hoàn thành câu thứ hai...<br><b>Giải thích chi tiết:</b> Trợ động từ 'does' dùng trước động từ nguyên thể 'enjoy' để nhấn mạnh."
-  }
-];
-const userState = {};
-let audioCtx = null;
-let studentName = '';
-const totalQuestions = quizData.length;
-
-function escapeHTML(str){
-  const d=document.createElement('div');
-  d.textContent=str;
-  return d.innerHTML;
-}
-
-function normalizeAnswer(str){
-  return str.trim().replace(/\s+/g,' ').toLowerCase();
-}
-
-function normalizeSentence(str){
-  return str.trim().replace(/\s+/g,' ').replace(/\s+([.,!?;:])/g,'$1');
-}
-
-function initAudio() {
-  if (!audioCtx) {
-    try {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    } catch (e) {}
-  }
-}
-
-function playSelectSound() {
-  if (!audioCtx) return;
-  try {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(600, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.08);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.08);
-  } catch(e) {}
-}
-
-function playCorrectSound() {
-  if (!audioCtx) return;
-  try {
-    const osc1 = audioCtx.createOscillator();
-    const gain1 = audioCtx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.setValueAtTime(800, audioCtx.currentTime);
-    gain1.gain.setValueAtTime(0.2, audioCtx.currentTime);
-    gain1.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
-    osc1.connect(gain1);
-    gain1.connect(audioCtx.destination);
-    osc1.start();
-    osc1.stop(audioCtx.currentTime + 0.1);
-
-    const osc2 = audioCtx.createOscillator();
-    const gain2 = audioCtx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(1200, audioCtx.currentTime + 0.1);
-    gain2.gain.setValueAtTime(0.2, audioCtx.currentTime + 0.1);
-    gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
-    osc2.connect(gain2);
-    gain2.connect(audioCtx.destination);
-    osc2.start(audioCtx.currentTime + 0.1);
-    osc2.stop(audioCtx.currentTime + 0.25);
-  } catch(e) {}
-}
-
-function playWrongSound() {
-  if (!audioCtx) return;
-  try {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'square';
-    osc.frequency.setValueAtTime(150, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.2);
-  } catch(e) {}
-}
-
-function playSubmitSound() {
-  if (!audioCtx) return;
-  try {
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
-    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.12);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start();
-    osc.stop(audioCtx.currentTime + 0.12);
-  } catch(e) {}
-}
-
-function startQuiz() {
-  const nameInput = document.getElementById('student-name').value.trim();
-  if (!nameInput) {
-    alert('Vui lòng nhập tên để bắt đầu!');
-    return;
-  }
-  studentName = nameInput;
-  document.getElementById('student-info-modal').style.display = 'none';
-  initAudio();
-  renderQuiz();
-}
-
-function renderQuiz() {
-  const container = document.getElementById('quiz-container');
-  container.innerHTML = '';
-  quizData.forEach(q => {
-    userState[q.id] = { checked: false, isCorrect: null, answer: null, blankResults: null };
-    if (q.type === 'gap_fill_text' && q.blanks) {
-      userState[q.id].answer = {};
-      userState[q.id].blankResults = {};
-      q.blanks.forEach(b => {
-        userState[q.id].answer[b.blankId] = null;
-      });
-    } else if (q.type === 'reordering') {
-      userState[q.id].answer = [];
-    }
-
-    const card = document.createElement('div');
-    card.className = 'card';
-    card.id = `card-${q.id}`;
-
-    let contentHTML = `<div class="question-html" id="qhtml-${q.id}">${q.questionHTML}</div>`;
-
-    if (q.type === 'gap_fill_text') {
-      let finalHTML = q.questionHTML;
-      q.blanks.forEach(b => {
-        finalHTML = finalHTML.replace(`{{blank:${b.blankId}}}`, `<input type="text" id="input-${q.id}-${b.blankId}" oninput="handleGapFill(${q.id}, '${b.blankId}')" placeholder="..."> <span id="feedback-${q.id}-${b.blankId}"></span>`);
-      });
-      contentHTML = `<div class="question-html" id="qhtml-${q.id}">${finalHTML}</div>`;
-    } else if (q.type === 'reordering') {
-      let bankHTML = `<div class="reordering-bank" id="bank-${q.id}">`;
-      const shuffledWords = [...q.words].sort(() => Math.random() - 0.5);
-      shuffledWords.forEach(w => {
-        bankHTML += `<div class="chip" id="chip-bank-${q.id}-${w.tokenId}" onclick="handleReorderSelect(${q.id}, '${w.tokenId}', '${escapeHTML(w.text)}')">${escapeHTML(w.text)}</div>`;
-      });
-      bankHTML += `</div>`;
-      let targetHTML = `<div class="reordering-target" id="target-${q.id}"></div>`;
-      let actionsHTML = `<div style="margin-bottom: 16px;"><button class="btn" style="background:#64748b; min-height:36px; padding: 8px 16px;" onclick="resetReorder(${q.id})">Làm lại</button></div>`;
-      contentHTML += bankHTML + targetHTML + actionsHTML;
-    } else if (q.type === 'sentence_rewrite') {
-      contentHTML = `<div class="question-html">${q.questionHTML}</div>`;
-      contentHTML += `<div class="textarea-container"><textarea id="textarea-${q.id}" oninput="handleTextarea(${q.id})"></textarea></div>`;
-    }
-
-    card.innerHTML = `
-      ${contentHTML}
-      <button class="btn" id="check-btn-${q.id}" onclick="checkAnswer(${q.id})" disabled>Kiểm tra</button>
-      <div class="explanation" id="expl-${q.id}">${q.explanationHTML}</div>
-    `;
-    container.appendChild(card);
-  });
-  updateProgress();
-}
-
-window.handleGapFill = function(qId, blankId) {
-  if (userState[qId].checked) return;
-  initAudio();
-  const val = document.getElementById(`input-${qId}-${blankId}`).value;
-  if (!userState[qId].firstTyped) {
-     playSelectSound();
-     userState[qId].firstTyped = true;
-  }
-  userState[qId].answer[blankId] = val;
-  
-  if (val.trim() !== '') {
-     document.getElementById(`input-${qId}-${blankId}`).style.backgroundColor = 'var(--color-pending)';
-     document.getElementById(`input-${qId}-${blankId}`).style.color = 'var(--color-pending-text)';
-  } else {
-     document.getElementById(`input-${qId}-${blankId}`).style.backgroundColor = 'white';
-     document.getElementById(`input-${qId}-${blankId}`).style.color = 'inherit';
-  }
-  
-  updateCheckBtn(qId);
-  updateProgress();
-};
-
-window.handleReorderSelect = function(qId, tokenId, text) {
-  if (userState[qId].checked) return;
-  initAudio();
-  playSelectSound();
-  const bankChip = document.getElementById(`chip-bank-${qId}-${tokenId}`);
-  bankChip.classList.add('used');
-  userState[qId].answer.push(tokenId);
-  
-  const target = document.getElementById(`target-${qId}`);
-  const targetChip = document.createElement('div');
-  targetChip.className = 'chip-in-target';
-  targetChip.textContent = text;
-  target.appendChild(targetChip);
-  
-  target.style.backgroundColor = 'var(--color-pending)';
-  
-  updateCheckBtn(qId);
-  updateProgress();
-};
-
-window.resetReorder = function(qId) {
-  if (userState[qId].checked) return;
-  userState[qId].answer = [];
-  document.getElementById(`target-${qId}`).innerHTML = '';
-  document.getElementById(`target-${qId}`).style.backgroundColor = 'transparent';
-  const q = quizData.find(x => x.id === qId);
-  q.words.forEach(w => {
-    document.getElementById(`chip-bank-${qId}-${w.tokenId}`).classList.remove('used');
-  });
-  updateCheckBtn(qId);
-  updateProgress();
-};
-
-window.handleTextarea = function(qId) {
-  if (userState[qId].checked) return;
-  initAudio();
-  const val = document.getElementById(`textarea-${qId}`).value;
-  if (!userState[qId].firstTyped) {
-     playSelectSound();
-     userState[qId].firstTyped = true;
-  }
-  userState[qId].answer = val;
-  
-  if (val.trim() !== '') {
-     document.getElementById(`textarea-${qId}`).style.backgroundColor = 'var(--color-pending)';
-     document.getElementById(`textarea-${qId}`).style.color = 'var(--color-pending-text)';
-  } else {
-     document.getElementById(`textarea-${qId}`).style.backgroundColor = 'white';
-     document.getElementById(`textarea-${qId}`).style.color = 'inherit';
-  }
-  
-  updateCheckBtn(qId);
-  updateProgress();
-};
-
-function updateCheckBtn(qId) {
-  const state = userState[qId];
-  const q = quizData.find(x => x.id === qId);
-  let canCheck = false;
-  if (q.type === 'gap_fill_text') {
-    canCheck = q.blanks.some(b => state.answer[b.blankId] && state.answer[b.blankId].trim() !== '');
-  } else if (q.type === 'reordering') {
-    canCheck = state.answer.length > 0;
-  } else if (q.type === 'sentence_rewrite') {
-    canCheck = state.answer && state.answer.trim() !== '';
-  }
-  document.getElementById(`check-btn-${qId}`).disabled = !canCheck;
-}
-
-function updateProgress() {
-  let answered = 0;
-  quizData.forEach(q => {
-    const state = userState[q.id];
-    if (q.type === 'gap_fill_text') {
-      if (q.blanks.some(b => state.answer[b.blankId] && state.answer[b.blankId].trim() !== '')) answered++;
-    } else if (q.type === 'reordering') {
-      if (state.answer.length > 0) answered++;
-    } else if (q.type === 'sentence_rewrite') {
-      if (state.answer && state.answer.trim() !== '') answered++;
-    }
-  });
-  document.getElementById('progress-text').textContent = `${answered} / ${totalQuestions}`;
-  document.getElementById('progress-bar').style.width = `${(answered / totalQuestions) * 100}%`;
-}
-
-window.checkAnswer = function(qId) {
-  const state = userState[qId];
-  if (state.checked) return;
-  const q = quizData.find(x => x.id === qId);
-  
-  let isReady = false;
-  if (q.type === 'gap_fill_text') {
-    isReady = q.blanks.every(b => state.answer[b.blankId] && state.answer[b.blankId].trim() !== '');
-  } else if (q.type === 'reordering') {
-    isReady = state.answer.length === q.words.length;
-  } else if (q.type === 'sentence_rewrite') {
-    isReady = state.answer && state.answer.trim() !== '';
-  }
-  
-  if (!isReady) {
-    alert('Vui lòng hoàn thành toàn bộ câu hỏi trước khi kiểm tra!');
-    return;
-  }
-  
-  state.checked = true;
-  document.getElementById(`check-btn-${qId}`).disabled = true;
-  document.getElementById(`expl-${qId}`).style.display = 'block';
-  
-  if (q.type === 'gap_fill_text') {
-    let allCorrect = true;
-    q.blanks.forEach(b => {
-      const userAns = normalizeAnswer(state.answer[b.blankId]);
-      const isBlankCorrect = b.correctAnswers.some(ans => normalizeAnswer(ans) === userAns);
-      state.blankResults[b.blankId] = isBlankCorrect;
-      const inputEl = document.getElementById(`input-${qId}-${b.blankId}`);
-      const feedbackEl = document.getElementById(`feedback-${qId}-${b.blankId}`);
-      inputEl.disabled = true;
-      if (isBlankCorrect) {
-        inputEl.style.backgroundColor = 'var(--color-correct)';
-        inputEl.style.color = 'white';
-        inputEl.style.borderColor = 'var(--color-correct)';
-      } else {
-        allCorrect = false;
-        inputEl.style.backgroundColor = 'var(--color-wrong)';
-        inputEl.style.color = 'white';
-        inputEl.style.borderColor = 'var(--color-wrong)';
-        inputEl.classList.add('shake');
-        feedbackEl.innerHTML = ` <span class="correct-text">${escapeHTML(b.correctAnswers[0])}</span>`;
-      }
-    });
-    state.isCorrect = allCorrect;
-    if (allCorrect) playCorrectSound(); else playWrongSound();
-  } else if (q.type === 'reordering') {
-    const userSentence = normalizeSentence(state.answer.map(tId => q.words.find(w => w.tokenId === tId).text).join(' '));
-    const correctSen = normalizeSentence(q.correctOrder);
-    state.isCorrect = (userSentence === correctSen);
-    const targetEl = document.getElementById(`target-${qId}`);
-    if (state.isCorrect) {
-      targetEl.style.backgroundColor = 'var(--color-correct)';
-      playCorrectSound();
-    } else {
-      targetEl.style.backgroundColor = 'var(--color-wrong)';
-      targetEl.classList.add('shake');
-      const correctDiv = document.createElement('div');
-      correctDiv.className = 'correct-text';
-      correctDiv.style.width = '100%';
-      correctDiv.style.marginTop = '10px';
-      correctDiv.textContent = q.correctOrder;
-      targetEl.appendChild(correctDiv);
-      playWrongSound();
-    }
-  } else if (q.type === 'sentence_rewrite') {
-    state.isCorrect = null;
-    const txtArea = document.getElementById(`textarea-${qId}`);
-    txtArea.disabled = true;
-    txtArea.style.backgroundColor = '#f1f5f9';
-    txtArea.style.color = '#333';
-    const sampleDiv = document.createElement('div');
-    sampleDiv.className = 'correct-text';
-    sampleDiv.style.marginTop = '10px';
-    sampleDiv.innerHTML = 'Đáp án mẫu:<br>' + q.sampleAnswers.map(s => escapeHTML(s)).join('<br>');
-    txtArea.parentNode.appendChild(sampleDiv);
-  }
-}
-
-window.submitQuiz = function() {
-  let totalGradable = 0;
-  let correctCount = 0;
-  let wrongDetails = [];
-  let essayCount = 0;
-  
-  quizData.forEach(q => {
-    const state = userState[q.id];
-    if (!state.checked) {
-      if (q.type === 'sentence_rewrite') {
-        state.checked = true;
-        state.isCorrect = null;
-      } else {
-        state.checked = true;
-        state.isCorrect = false;
-        if (q.type === 'gap_fill_text') {
-          q.blanks.forEach(b => {
-            state.blankResults[b.blankId] = false;
-          });
-        }
-      }
-    }
+    <div class="watermark">GV biên soạn: Ms Chí Nên - 0852639652</div>
+    <div class="name-screen" id="nameScreen">
+        <div class="name-box">
+            <h2>Nhập tên của bạn</h2>
+            <input type="text" id="studentName" class="name-input" placeholder="Họ và tên...">
+            <button class="btn-start" onclick="startQuiz()">Bắt đầu làm bài</button>
+        </div>
+    </div>
     
-    if (state.isCorrect !== null) {
-      totalGradable++;
-      if (state.isCorrect) correctCount++;
-      else {
-        let errorTxt = `Câu ${q.id}: Học sinh làm sai`;
-        if (q.type === 'gap_fill_text') {
-           let userAnsStr = q.blanks.map(b => `${b.blankId}: ${state.answer[b.blankId] || '[trống]'}`).join(', ');
-           let correctAnsStr = q.blanks.map(b => `${b.blankId}: ${q.correctAnswers?.[0] || b.correctAnswers[0]}`).join(', ');
-           errorTxt = `Câu ${q.id}: Học sinh điền "${userAnsStr}" (sai), đáp án đúng là "${correctAnsStr}"`;
-        } else if (q.type === 'reordering') {
-           let userAnsStr = state.answer.map(tId => q.words.find(w => w.tokenId === tId).text).join(' ');
-           errorTxt = `Câu ${q.id}: Học sinh ghép "${userAnsStr}" (sai), đáp án đúng là "${q.correctOrder}"`;
+    <div class="top-bar">
+        <div id="progressText">0/0</div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <button id="btnSubmit" class="btn-check" style="width: auto; padding: 8px 16px; min-height: auto; margin: 0;" onclick="submitQuiz()">Nộp bài</button>
+    </div>
+
+    <div class="container" id="quizContainer"></div>
+    
+    <div class="container wrong-list" id="wrongList">
+        <h2>DANH SÁCH CÁC CÂU LÀM SAI</h2>
+        <div id="wrongItems"></div>
+    </div>
+    
+    <div class="footer-watermark">GV biên soạn: Ms Chí Nên - 0852639652</div>
+    
+    <div class="overlay" id="popupOverlay">
+        <div class="popup">
+            <h2 id="popupTitle">Kết quả</h2>
+            <p id="popupScore" style="font-size: 24px; font-weight: bold; margin: 20px 0;"></p>
+            <p id="popupMessage"></p>
+            <button class="btn-start" onclick="closePopup()">Xem chi tiết</button>
+        </div>
+    </div>
+
+    <script>
+        const quizData = [
+            {
+                id: 1,
+                type: 'gap_fill_text',
+                questionHTML: '<b>F. Complete using the correct form of the words in the box (be, disagree, do, include, know, look, see, seem, understand)</b><br><br>Ancient aviators?<br>Everyone {{blank:b1}} that humans have been flying for only a few hundred years. But {{blank:b2}} it possible that ancient civilizations also had the ability and technology to fly?<br>In the Nazcan Desert in southern Peru, there are hundreds of lines which an ancient culture drew in the dust. On the ground, they just {{blank:b3}} like straight lines. But when you {{blank:b4}} them from the air, you {{blank:b5}} exactly what they are. They are incredible and enormous pictures. The pictures {{blank:b6}} animals, birds and symbols.<br>One bizarre theory, which most mainstream scientists {{blank:b7}} with, is that the people who made the lines thousands and thousands of years ago flew above the lines in balloons. It {{blank:b8}} incredible, but a few people {{blank:b9}} believe it\'s possible.',
+                blanks: [
+                    { blankId: 'b1', correctAnswers: ['knows'] },
+                    { blankId: 'b2', correctAnswers: ['is'] },
+                    { blankId: 'b3', correctAnswers: ['look'] },
+                    { blankId: 'b4', correctAnswers: ['see'] },
+                    { blankId: 'b5', correctAnswers: ['understand'] },
+                    { blankId: 'b6', correctAnswers: ['include'] },
+                    { blankId: 'b7', correctAnswers: ['disagree'] },
+                    { blankId: 'b8', correctAnswers: ['seems'] },
+                    { blankId: 'b9', correctAnswers: ['do'] }
+                ],
+                explanationHTML: '<b>Giải thích:</b><br>- (1) <b>knows</b>: Everyone đi với động từ số ít.<br>- (2) <b>is</b>: Câu hỏi to be ở hiện tại.<br>- (3) <b>look</b>: they look like (chúng trông như).<br>- (4) <b>see</b>: see them (nhìn thấy chúng).<br>- (5) <b>understand</b>: hiểu chính xác chúng là gì.<br>- (6) <b>include</b>: bao gồm.<br>- (7) <b>disagree</b>: disagree with (không đồng ý với).<br>- (8) <b>seems</b>: It seems (dường như).<br>- (9) <b>do</b>: do believe (nhấn mạnh động từ believe).'
+            },
+            { id: 2, type: 'reordering', questionHTML: '<b>G. Match to make sentences (1)</b>', words: [{tokenId:'t1', text:'I think'}, {tokenId:'t2', text:"I'm going"}, {tokenId:'t3', text:'to buy'}, {tokenId:'t4', text:'the new Racetrack CD.'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> I think I\'m going to buy the new Racetrack CD. (Tôi nghĩ tôi sẽ mua đĩa CD Racetrack mới.)' },
+            { id: 3, type: 'reordering', questionHTML: '<b>G. Match to make sentences (2)</b>', words: [{tokenId:'t1', text:"I'm thinking"}, {tokenId:'t2', text:'of getting'}, {tokenId:'t3', text:'Dad a CD'}, {tokenId:'t4', text:'for his birthday.'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> I\'m thinking of getting Dad a CD for his birthday. (Tôi đang nghĩ đến việc mua cho bố một đĩa CD nhân dịp sinh nhật.)' },
+            { id: 4, type: 'reordering', questionHTML: '<b>G. Match to make sentences (3)</b>', words: [{tokenId:'t1', text:"Phil's looking"}, {tokenId:'t2', text:'for his glasses.'}, {tokenId:'t3', text:'Have you'}, {tokenId:'t4', text:'seen them?'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> Phil\'s looking for his glasses. Have you seen them? (Phil đang tìm kính. Bạn có thấy chúng không?)' },
+            { id: 5, type: 'reordering', questionHTML: '<b>G. Match to make sentences (4)</b>', words: [{tokenId:'t1', text:'Phil looks'}, {tokenId:'t2', text:'like'}, {tokenId:'t3', text:'he needs'}, {tokenId:'t4', text:'a holiday!'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> Phil looks like he needs a holiday! (Phil trông như thể anh ấy cần một kỳ nghỉ!)' },
+            { id: 6, type: 'reordering', questionHTML: '<b>G. Match to make sentences (5)</b>', words: [{tokenId:'t1', text:'Claire has'}, {tokenId:'t2', text:'darker hair'}, {tokenId:'t3', text:'than'}, {tokenId:'t4', text:'her sister.'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> Claire has darker hair than her sister. (Claire có mái tóc sẫm màu hơn em gái.)' },
+            { id: 7, type: 'reordering', questionHTML: '<b>G. Match to make sentences (6)</b>', words: [{tokenId:'t1', text:'Claire is having'}, {tokenId:'t2', text:'a haircut'}, {tokenId:'t3', text:'at'}, {tokenId:'t4', text:'the moment.'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> Claire is having a haircut at the moment. (Claire đang cắt tóc lúc này.)' },
+            { id: 8, type: 'reordering', questionHTML: '<b>G. Match to make sentences (7)</b>', words: [{tokenId:'t1', text:'Andy is'}, {tokenId:'t2', text:'not old enough'}, {tokenId:'t3', text:'to drive'}, {tokenId:'t4', text:'a car.'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> Andy is not old enough to drive a car. (Andy chưa đủ tuổi lái ô tô.)' },
+            { id: 9, type: 'reordering', questionHTML: '<b>G. Match to make sentences (8)</b>', words: [{tokenId:'t1', text:'Andy is being'}, {tokenId:'t2', text:'very annoying'}, {tokenId:'t3', text:'at'}, {tokenId:'t4', text:'the moment!'}], correctOrder: ['t1','t2','t3','t4'], explanationHTML: '<b>Giải thích:</b> Andy is being very annoying at the moment! (Andy đang tỏ ra rất phiền phức lúc này!)' },
+            
+            { id: 10, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> I\'ve been to travelling round Europe all summer. It\'s the first time I\'ve<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['to']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>to</b>. Cấu trúc thì hiện tại hoàn thành tiếp diễn: have been + V-ing, không có to ở giữa.' },
+            { id: 11, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> ever been going abroad, and I\'ve had a fantastic time! I\'ve seen<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['been']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>been</b>. Đây là trải nghiệm (ever) nên dùng thì hiện tại hoàn thành: have ever gone.' },
+            { id: 12, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> loads of interesting places and I have to also made loads of new friends.<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['to']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>to</b>. Cấu trúc hiện tại hoàn thành: have + also + V3/ed (made), không có to.' },
+            { id: 13, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> I\'ve been decided to stay in touch with them now I\'m back. One of<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['been']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>been</b>. Câu chủ động thì hiện tại hoàn thành: have decided, không phải bị động.' },
+            { id: 14, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> them, Giselle, is French. She was making on holiday too. We now send<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['making']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>making</b>. Cụm từ là "be on holiday" (đi nghỉ), không dùng making.' },
+            { id: 15, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> text messages are to each other all the time. They\'re usually in English<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['are']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>are</b>. Động từ chính là send, không cần to be.' },
+            { id: 16, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> because my French isn\'t very good! I\'m planning to have visit her in<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['have']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>have</b>. Plan to do something (dự định làm gì) -> plan to visit, không có have.' },
+            { id: 17, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> France next year sometime. I hope I can. I am love meeting people from<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['am']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>am</b>. Love là động từ thường, không đi kèm to be trong thì hiện tại đơn.' },
+            { id: 18, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> other countries! I want to have had lots of friends from all over the world!<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['had']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>had</b>. Want to have (muốn có), không dùng have had.' },
+            { id: 19, type: 'gap_fill_text', questionHTML: '<b>Tìm từ thừa:</b> Travelling certainly broadens the mind but it also is broadens your circle of friends!<br>{{blank:b1}}', blanks: [{blankId: 'b1', correctAnswers: ['is']}], explanationHTML: '<b>Giải thích:</b> Từ thừa là <b>is</b>. Broadens là động từ thường chia ngôi thứ 3 số ít, không dùng to be đi kèm.' },
+            
+            {
+                id: 20,
+                type: 'gap_fill_text',
+                questionHTML: '<b>I. Write one word in each gap.</b><br><br>Holiday Blues<br>\'You\'ve {{blank:b1}} looking at that timetable for the last ten minutes. It can\'t be that confusing!\' said Sheila angrily.<br>\'I {{blank:b2}} wish you\'d be quiet! I\'ve {{blank:b3}} a splitting headache thanks to you!\' replied Matt.<br>\'Mum! Dad! Please!\' said Alison. \'You\'re both {{blank:b4}} very silly. {{blank:b5}} is no point at all in blaming each other. That\'s not going to help us find out what time the next train to Budapest is due to leave.\'<br>\'You {{blank:b6}} quite right, darling. I {{blank:b7}} sorry,\' said Sheila.<br>\'Me too,\' mumbled Matt. \'Now, let\'s have another look at this timetable. Well, it {{blank:b8}} like we {{blank:b9}} definitely missed the last train today. That was the 18.20 we just missed, wasn\'t it?\'<br>\'I {{blank:b10}} so,\' said Sheila. \'I mean, it did leave at 18.20. Whether it\'s actually going to Budapest or not is another question.\'<br>\'Well, one thing is {{blank:b11}} in doubt,\' said Matt.<br>\'What\'s that?\' asked Sheila and Alison together.<br>\'This is the worst holiday we\'ve {{blank:b12}} been on,\' said Matt. \'Next year, we\'re going to try something far less adventurous.\'<br>\'Agreed!\' said Sheila and Alison.',
+                blanks: [
+                    { blankId: 'b1', correctAnswers: ['been'] },
+                    { blankId: 'b2', correctAnswers: ['do'] },
+                    { blankId: 'b3', correctAnswers: ['got'] },
+                    { blankId: 'b4', correctAnswers: ['being'] },
+                    { blankId: 'b5', correctAnswers: ['there', 'There'] },
+                    { blankId: 'b6', correctAnswers: ['are'] },
+                    { blankId: 'b7', correctAnswers: ['am'] },
+                    { blankId: 'b8', correctAnswers: ['looks', 'seems'] },
+                    { blankId: 'b9', correctAnswers: ['have'] },
+                    { blankId: 'b10', correctAnswers: ['think', 'suppose', 'guess'] },
+                    { blankId: 'b11', correctAnswers: ['not'] },
+                    { blankId: 'b12', correctAnswers: ['ever'] }
+                ],
+                explanationHTML: '<b>Giải thích:</b><br>- (1) <b>been</b>: Hiện tại hoàn thành tiếp diễn (have been V-ing).<br>- (2) <b>do</b>: Nhấn mạnh động từ wish (I do wish).<br>- (3) <b>got</b>: have got = have (có).<br>- (4) <b>being</b>: are being silly (đang cư xử ngớ ngẩn).<br>- (5) <b>There</b>: There is no point in (Vô ích khi làm gì).<br>- (6) <b>are</b>: You are right.<br>- (7) <b>am</b>: I am sorry.<br>- (8) <b>looks</b>: it looks like (trông có vẻ như).<br>- (9) <b>have</b>: thì hiện tại hoàn thành (have missed).<br>- (10) <b>think/suppose/guess</b>: I think so (Tôi nghĩ vậy).<br>- (11) <b>not</b>: is not in doubt (không có gì phải nghi ngờ).<br>- (12) <b>ever</b>: so sánh nhất đi với hiện tại hoàn thành (the worst... we have ever been on).'
+            },
+            
+            { id: 21, type: 'gap_fill_text', questionHTML: '<b>J. Complete each second sentence using the word given... Write between two and five words.</b><br><br>1. What\'s the price of the tickets, Jimmy? <b>much</b><br>How {{blank:b1}}, Jimmy?', blanks: [{blankId: 'b1', correctAnswers: ['much are the tickets']}], explanationHTML: '<b>Giải thích:</b> <b>much are the tickets</b>. How much + to be + S? hỏi giá tiền.' },
+            { id: 22, type: 'gap_fill_text', questionHTML: '2. Are these your trainers? <b>to</b><br>Do {{blank:b1}} you?', blanks: [{blankId: 'b1', correctAnswers: ['these trainers belong to']}], explanationHTML: '<b>Giải thích:</b> <b>these trainers belong to</b>. belong to: thuộc về.' },
+            { id: 23, type: 'gap_fill_text', questionHTML: '3. Sasha\'s not keen on team sports at all. <b>like</b><br>Sasha {{blank:b1}} team sports at all.', blanks: [{blankId: 'b1', correctAnswers: ['does not like', "doesn't like"]}], explanationHTML: '<b>Giải thích:</b> <b>does not like / doesn\'t like</b>. be keen on = like.' },
+            { id: 24, type: 'gap_fill_text', questionHTML: '4. It\'s only her second time in a recording studio. <b>been</b><br>She {{blank:b1}} in a recording studio once before.', blanks: [{blankId: 'b1', correctAnswers: ['has only been']}], explanationHTML: '<b>Giải thích:</b> <b>has only been</b>. Cấu trúc hiện tại hoàn thành.' },
+            { id: 25, type: 'gap_fill_text', questionHTML: '5. We got here three hours ago. <b>have</b><br>We {{blank:b1}} three hours.', blanks: [{blankId: 'b1', correctAnswers: ['have been here for']}], explanationHTML: '<b>Giải thích:</b> <b>have been here for</b>. Hành động bắt đầu trong quá khứ kéo dài đến hiện tại dùng HTHT, for + khoảng thời gian.' },
+            { id: 26, type: 'gap_fill_text', questionHTML: '6. I started writing this hours ago and it\'s still not right. <b>writing</b><br>I {{blank:b1}} hours and it\'s still not right.', blanks: [{blankId: 'b1', correctAnswers: ['have been writing this for']}], explanationHTML: '<b>Giải thích:</b> <b>have been writing this for</b>. Hành động liên tục dùng HTHT tiếp diễn.' },
+            { id: 27, type: 'gap_fill_text', questionHTML: '7. This is my first experience of flying alone. <b>time</b><br>It is the first {{blank:b1}} alone.', blanks: [{blankId: 'b1', correctAnswers: ['time I have flown']}], explanationHTML: '<b>Giải thích:</b> <b>time I have flown</b>. It is the first time + S + HTHT.' },
+            { id: 28, type: 'gap_fill_text', questionHTML: '8. Sharon\'s in the bath at the moment. <b>a</b><br>Sharon {{blank:b1}} at the moment.', blanks: [{blankId: 'b1', correctAnswers: ['is having a bath']}], explanationHTML: '<b>Giải thích:</b> <b>is having a bath</b>. have a bath = tắm, đang xảy ra nên dùng HTTD.' },
+            { id: 29, type: 'gap_fill_text', questionHTML: '9. Paul enjoys surprises apart from on his birthday. <b>does</b><br>Paul {{blank:b1}} surprises, just not on his birthday!', blanks: [{blankId: 'b1', correctAnswers: ['does enjoy']}], explanationHTML: '<b>Giải thích:</b> <b>does enjoy</b>. Trợ động từ does dùng để nhấn mạnh.' }
+        ];
+
+        let userState = {};
+        let audioCtx;
+        let studentName = '';
+        
+        function escapeHTML(str){const d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+        function normalizeAnswer(str){return str.trim().replace(/\s+/g,' ').toLowerCase();}
+        function normalizeSentence(str){return str.trim().replace(/\s+/g,' ').replace(/\s+([.,!?;:])/g,'$1');}
+        
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
         }
-        wrongDetails.push(errorTxt);
-      }
-    } else {
-      essayCount++;
-    }
-  });
+        function playSine(freq, dur, gainVol) {
+            if(!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+                gain.gain.setValueAtTime(gainVol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + dur);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + dur);
+            } catch(e) {}
+        }
+        function playSelectSound() { playSine(600, 0.08, 0.15); }
+        function playCorrectSound() { 
+            playSine(800, 0.1, 0.2); 
+            setTimeout(() => playSine(1200, 0.15, 0.2), 100); 
+        }
+        function playWrongSound() {
+            if(!audioCtx) return;
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.2);
+            } catch(e) {}
+        }
+        function playSubmitSound() { playSine(500, 0.12, 0.15); }
 
-  const score = totalGradable > 0 ? ((correctCount / totalGradable) * 10).toFixed(1) : '0';
-  
-  const formData = new URLSearchParams();
-  formData.append('entry.1861648410', studentName);
-  formData.append('entry.1691800437', score);
-  formData.append('entry.639295732', wrongDetails.join('\n'));
-  formData.append('entry.370465671', 'Unit 1 Grammar Quiz');
+        function startQuiz() {
+            const nameInput = document.getElementById('studentName').value.trim();
+            if(!nameInput) {
+                alert('Vui lòng nhập tên trước khi làm bài!');
+                return;
+            }
+            studentName = nameInput;
+            document.getElementById('nameScreen').style.display = 'none';
+            initAudio();
+            renderQuiz();
+        }
 
-  fetch('https://docs.google.com/forms/d/e/1FAIpQLSfZCAK2lpNE8O8Ieqwc3SI1ubr6HZDvGZR91AsSpUk8kEBqaA/formResponse', {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: formData
-  }).catch(e => console.log(e));
+        function initData() {
+            quizData.forEach(q => {
+                if(q.type === 'gap_fill_text') {
+                    if(q.blanks) {
+                        let ans = {};
+                        q.blanks.forEach(b => ans[b.blankId] = '');
+                        userState[q.id] = { answer: ans, checked: false, isCorrect: null, blankResults: {} };
+                    }
+                } else if(q.type === 'reordering') {
+                    userState[q.id] = { answer: [], checked: false, isCorrect: null };
+                }
+            });
+        }
 
-  document.getElementById('submit-btn').disabled = true;
-  
-  if (totalGradable === 0) {
-    playSubmitSound();
-    document.getElementById('modal-score').textContent = 'Bài này không có câu được chấm tự động.';
-  } else {
-    playSubmitSound();
-    if (correctCount === totalGradable) setTimeout(playCorrectSound, 500);
-    document.getElementById('modal-score').textContent = `Điểm: ${correctCount} / ${totalGradable} (${score}/10)`;
-  }
-  
-  if (essayCount > 0) {
-    document.getElementById('modal-feedback').textContent = `Bạn đã hoàn thành ${essayCount} câu trả lời tự do.`;
-  }
-  
-  document.getElementById('result-modal').style.display = 'flex';
-  
-  renderWrongList();
-}
+        function renderQuiz() {
+            initData();
+            const container = document.getElementById('quizContainer');
+            quizData.forEach((q, idx) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.id = 'card-' + q.id;
+                
+                let contentHTML = '<div class="question-text">' + (idx+1) + '. ' + q.questionHTML + '</div>';
+                
+                if (q.type === 'gap_fill_text') {
+                    let html = contentHTML;
+                    q.blanks.forEach(b => {
+                        const inputHtml = `<input type="text" class="gap-input" id="gap-${q.id}-${b.blankId}" oninput="handleGapInput(${q.id}, '${b.blankId}', this.value)">`;
+                        html = html.replace(`{{blank:${b.blankId}}}`, inputHtml);
+                    });
+                    contentHTML = html;
+                } else if (q.type === 'reordering') {
+                    let bankHTML = '<div class="bank-area" id="bank-' + q.id + '">';
+                    const shuffled = [...q.words].sort(() => Math.random() - 0.5);
+                    shuffled.forEach(w => {
+                        bankHTML += `<div class="chip" id="chip-${q.id}-${w.tokenId}" onclick="handleChipClick(${q.id}, '${w.tokenId}')">${escapeHTML(w.text)}</div>`;
+                    });
+                    bankHTML += '</div>';
+                    let slotHTML = `<div class="slot-area" id="slot-${q.id}"></div>`;
+                    contentHTML += slotHTML + bankHTML;
+                }
+                
+                contentHTML += `<button id="check-btn-${q.id}" class="btn-check" disabled onclick="checkAnswer(${q.id})">Kiểm tra</button>`;
+                contentHTML += `<div id="exp-${q.id}" class="explanation">${q.explanationHTML}</div>`;
+                
+                card.innerHTML = contentHTML;
+                container.appendChild(card);
+            });
+            updateProgress();
+        }
 
-function renderWrongList() {
-  const container = document.getElementById('wrong-list-container');
-  const itemsContainer = document.getElementById('wrong-list-items');
-  const essayContainer = document.getElementById('essay-list-items');
-  itemsContainer.innerHTML = '';
-  essayContainer.innerHTML = '';
-  
-  let hasWrong = false;
-  let hasEssay = false;
-  let allCorrect = true;
+        function handleGapInput(qId, blankId, value) {
+            initAudio();
+            const st = userState[qId];
+            if(st.checked) return;
+            const input = document.getElementById(`gap-${qId}-${blankId}`);
+            
+            if(value.trim().length > 0 && st.answer[blankId] === '') {
+                playSelectSound();
+            }
+            
+            st.answer[blankId] = value;
+            if(value.trim() !== '') {
+                input.classList.add('pending');
+            } else {
+                input.classList.remove('pending');
+            }
+            
+            const q = quizData.find(x => x.id === qId);
+            const allFilled = q.blanks.every(b => st.answer[b.blankId].trim() !== '');
+            document.getElementById('check-btn-' + qId).disabled = !allFilled;
+            updateProgress();
+        }
 
-  quizData.forEach(q => {
-    const state = userState[q.id];
-    if (state.isCorrect === false) {
-      hasWrong = true;
-      allCorrect = false;
-      const div = document.createElement('div');
-      div.className = 'card';
-      let content = `<h3>Câu ${q.id}</h3><div class="question-html">${q.questionHTML}</div>`;
-      
-      if (q.type === 'gap_fill_text') {
-        let fb = '';
-        q.blanks.forEach(b => {
-          const uAns = state.answer[b.blankId];
-          const cAns = q.correctAnswers ? q.correctAnswers[0] : b.correctAnswers[0];
-          fb += `<div>Blank ${b.blankId}: ` + (uAns ? `<span class="wrong-text">${escapeHTML(uAns)}</span>` : `<span>(Chưa điền)</span>`) + ` <span class="correct-text">${escapeHTML(cAns)}</span></div>`;
-        });
-        content += fb;
-      } else if (q.type === 'reordering') {
-        const userSen = state.answer.map(tId => q.words.find(w => w.tokenId === tId).text).join(' ');
-        content += `<div>Câu của bạn: ` + (userSen ? `<span class="wrong-text">${escapeHTML(userSen)}</span>` : `<span>(Chưa làm)</span>`) + `</div>`;
-        content += `<div>Đáp án đúng: <span class="correct-text">${escapeHTML(q.correctOrder)}</span></div>`;
-      }
-      content += `<div class="explanation" style="display:block">${q.explanationHTML}</div>`;
-      div.innerHTML = content;
-      itemsContainer.appendChild(div);
-    } else if (state.isCorrect === null) {
-      hasEssay = true;
-      const div = document.createElement('div');
-      div.className = 'card';
-      let content = `<h3>Câu ${q.id}</h3><div class="question-html">${q.questionHTML}</div>`;
-      const uAns = state.answer;
-      content += `<div>Câu trả lời của bạn: ` + (uAns && uAns.trim() ? `<span>${escapeHTML(uAns)}</span>` : `<span>(Bạn chưa viết câu trả lời)</span>`) + `</div>`;
-      content += `<div class="correct-text" style="margin-top:10px;">Đáp án mẫu:<br>` + q.sampleAnswers.map(s => escapeHTML(s)).join('<br>') + `</div>`;
-      content += `<div class="explanation" style="display:block">${q.explanationHTML}</div>`;
-      div.innerHTML = content;
-      essayContainer.appendChild(div);
-    }
-  });
+        function handleChipClick(qId, tokenId) {
+            initAudio();
+            const st = userState[qId];
+            if(st.checked) return;
+            playSelectSound();
+            
+            const idx = st.answer.indexOf(tokenId);
+            if(idx === -1) {
+                st.answer.push(tokenId);
+                const chip = document.getElementById(`chip-${qId}-${tokenId}`);
+                document.getElementById(`slot-${qId}`).appendChild(chip);
+                chip.classList.add('in-slot');
+            } else {
+                st.answer.splice(idx, 1);
+                const chip = document.getElementById(`chip-${qId}-${tokenId}`);
+                document.getElementById(`bank-${qId}`).appendChild(chip);
+                chip.classList.remove('in-slot');
+            }
+            
+            const q = quizData.find(x => x.id === qId);
+            document.getElementById('check-btn-' + qId).disabled = (st.answer.length !== q.words.length);
+            updateProgress();
+        }
 
-  if (allCorrect && hasWrong===false) {
-      itemsContainer.innerHTML = '<h3 style="color:var(--color-correct); text-align:center;">Chúc mừng! Bạn đã trả lời đúng 100% các câu hỏi trắc nghiệm!</h3>';
-  }
-  container.style.display = 'block';
-}
+        function checkAnswer(qId) {
+            const q = quizData.find(x => x.id === qId);
+            const st = userState[qId];
+            if(st.checked) return;
+            
+            st.checked = true;
+            let isAllCorrect = true;
+            
+            if (q.type === 'gap_fill_text') {
+                q.blanks.forEach(b => {
+                    const input = document.getElementById(`gap-${qId}-${b.blankId}`);
+                    input.disabled = true;
+                    input.classList.remove('pending');
+                    
+                    const userVal = normalizeAnswer(st.answer[b.blankId] || '');
+                    const correctAnswers = b.correctAnswers.map(normalizeAnswer);
+                    
+                    if(correctAnswers.includes(userVal)) {
+                        st.blankResults[b.blankId] = true;
+                        input.classList.add('correct');
+                    } else {
+                        st.blankResults[b.blankId] = false;
+                        input.classList.add('wrong');
+                        isAllCorrect = false;
+                        const span = document.createElement('span');
+                        span.style.color = 'var(--color-correct)';
+                        span.style.fontWeight = 'bold';
+                        span.style.marginLeft = '8px';
+                        span.innerText = '(' + b.correctAnswers[0] + ')';
+                        input.parentNode.insertBefore(span, input.nextSibling);
+                    }
+                });
+            } else if (q.type === 'reordering') {
+                const userSentence = st.answer.map(tId => q.words.find(w => w.tokenId === tId).text).join(' ');
+                const correctSentence = q.correctOrder.map(tId => q.words.find(w => w.tokenId === tId).text).join(' ');
+                
+                if (normalizeSentence(userSentence) === normalizeSentence(correctSentence)) {
+                    isAllCorrect = true;
+                } else {
+                    isAllCorrect = false;
+                }
+                
+                const slot = document.getElementById(`slot-${qId}`);
+                slot.style.pointerEvents = 'none';
+                if(!isAllCorrect) {
+                    slot.style.borderColor = 'var(--color-wrong)';
+                    slot.style.animation = 'shake 0.2s';
+                    const div = document.createElement('div');
+                    div.style.color = 'var(--color-correct)';
+                    div.style.fontWeight = 'bold';
+                    div.style.marginTop = '10px';
+                    div.innerText = correctSentence;
+                    slot.parentNode.insertBefore(div, slot.nextSibling);
+                } else {
+                    slot.style.borderColor = 'var(--color-correct)';
+                    slot.style.backgroundColor = 'var(--color-correct)';
+                    Array.from(slot.children).forEach(c => c.style.color = 'var(--color-primary)');
+                }
+            }
+            
+            st.isCorrect = isAllCorrect;
+            if(isAllCorrect) playCorrectSound(); else playWrongSound();
+            
+            document.getElementById(`exp-${qId}`).style.display = 'block';
+            document.getElementById(`check-btn-${qId}`).disabled = true;
+        }
 
-window.closeModal = function() {
-  document.getElementById('result-modal').style.display = 'none';
-  document.getElementById('wrong-list-container').scrollIntoView({behavior: 'smooth'});
-}
-</script>
+        function updateProgress() {
+            let interacted = 0;
+            quizData.forEach(q => {
+                const st = userState[q.id];
+                if(q.type === 'gap_fill_text') {
+                    if(q.blanks.some(b => st.answer[b.blankId] && st.answer[b.blankId].trim() !== '')) interacted++;
+                } else if(q.type === 'reordering') {
+                    if(st.answer.length > 0) interacted++;
+                }
+            });
+            document.getElementById('progressText').innerText = `${interacted}/${quizData.length}`;
+            document.getElementById('progressBar').style.width = `${(interacted/quizData.length)*100}%`;
+        }
+
+        function submitQuiz() {
+            let correctCount = 0;
+            let wrongItemsHtml = '';
+            let detailedMistakes = '';
+            
+            quizData.forEach(q => {
+                const st = userState[q.id];
+                if(!st.checked) {
+                    // force check
+                    if(q.type === 'gap_fill_text') {
+                        q.blanks.forEach(b => { if(!st.answer[b.blankId]) st.answer[b.blankId] = ''; });
+                    }
+                    checkAnswer(q.id);
+                }
+                
+                if(st.isCorrect) {
+                    correctCount++;
+                } else {
+                    let userAnsText = '';
+                    let correctAnsText = '';
+                    if(q.type === 'gap_fill_text') {
+                        let wrongBlanks = [];
+                        q.blanks.forEach(b => {
+                            if(!st.blankResults[b.blankId]) {
+                                wrongBlanks.push(`[${escapeHTML(st.answer[b.blankId] || 'trống')} -> đúng là ${escapeHTML(b.correctAnswers[0])}]`);
+                            }
+                        });
+                        userAnsText = st.answer ? Object.values(st.answer).join(', ') : '';
+                        detailedMistakes += `Câu ${q.id}: Học sinh điền sai ở các chỗ trống: ${wrongBlanks.join(' ')}\n`;
+                        
+                        wrongItemsHtml += `<div class="card">`;
+                        wrongItemsHtml += `<div><b>Câu ${q.id}:</b> ${q.questionHTML}</div>`;
+                        wrongItemsHtml += `<div style="margin-top:10px; color:var(--color-wrong)">Các chỗ trống làm sai: ${wrongBlanks.join(', ')}</div>`;
+                        wrongItemsHtml += `<div class="explanation" style="display:block; margin-top:10px;">${q.explanationHTML}</div>`;
+                        wrongItemsHtml += `</div>`;
+                        
+                    } else if(q.type === 'reordering') {
+                        userAnsText = st.answer.map(tId => q.words.find(w => w.tokenId === tId).text).join(' ');
+                        correctAnsText = q.correctOrder.map(tId => q.words.find(w => w.tokenId === tId).text).join(' ');
+                        detailedMistakes += `Câu ${q.id}: Học sinh ghép ${userAnsText} (sai), đáp án đúng là ${correctAnsText}\n`;
+                        
+                        wrongItemsHtml += `<div class="card">`;
+                        wrongItemsHtml += `<div><b>Câu ${q.id}:</b> ${q.questionHTML}</div>`;
+                        wrongItemsHtml += `<div style="margin-top:10px; color:var(--color-wrong)">Bạn ghép: ${escapeHTML(userAnsText)}</div>`;
+                        wrongItemsHtml += `<div style="margin-top:5px; color:var(--color-correct)">Đáp án đúng: ${escapeHTML(correctAnsText)}</div>`;
+                        wrongItemsHtml += `<div class="explanation" style="display:block; margin-top:10px;">${q.explanationHTML}</div>`;
+                        wrongItemsHtml += `</div>`;
+                    }
+                }
+            });
+            
+            const score = correctCount;
+            document.getElementById('popupScore').innerText = `${score} / ${quizData.length}`;
+            if(score === quizData.length) {
+                playCorrectSound();
+                document.getElementById('popupMessage').innerText = 'Tuyệt vời! Bạn đã làm đúng tất cả.';
+            } else {
+                playSubmitSound();
+                document.getElementById('popupMessage').innerText = 'Hãy xem lại các câu sai bên dưới nhé.';
+                document.getElementById('wrongItems').innerHTML = wrongItemsHtml;
+                document.getElementById('wrongList').style.display = 'block';
+            }
+            
+            document.getElementById('popupOverlay').style.display = 'flex';
+            document.getElementById('btnSubmit').disabled = true;
+            
+            // Send to Google Form
+            const formData = new URLSearchParams();
+            formData.append('entry.1861648410', studentName);
+            formData.append('entry.1691800437', score.toString());
+            formData.append('entry.639295732', detailedMistakes || 'Không có lỗi sai');
+            formData.append('entry.370465671', 'Unit 1 (Sections F-J)');
+            
+            fetch('https://docs.google.com/forms/d/e/1FAIpQLSfZCAK2lpNE8O8Ieqwc3SI1ubr6HZDvGZR91AsSpUk8kEBqaA/formResponse', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: formData.toString()
+            }).catch(e => console.error(e));
+        }
+        
+        function closePopup() {
+            document.getElementById('popupOverlay').style.display = 'none';
+            if(document.getElementById('wrongList').style.display === 'block') {
+                document.getElementById('wrongList').scrollIntoView({behavior: 'smooth'});
+            }
+        }
+    </script>
 </body>
 </html>
