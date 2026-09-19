@@ -960,14 +960,20 @@ document.getElementById('submit-btn').addEventListener('click', function() {
     });
     const loisaiStr = loisai.length > 0 ? loisai.join(', ') : 'Không có';
     
-    const formUrl = `https://docs.google.com/forms/d/e/1FAIpQLSelQyzh_lWyb2vZUnQ1jc1p9FLRknDZiUt9NiUiiX1epHTFLw/formResponse?usp=pp_url&entry.351633352=link2&entry.1895948982=${encodeURIComponent(studentName)}&entry.1232319784=${score}&entry.1125920425=${encodeURIComponent(tile)}&entry.1907417670=${encodeURIComponent(loisaiStr)}`;
-    
-    const formForm = document.createElement('form');
-    formForm.action = formUrl;
-    formForm.method = 'POST';
-    formForm.target = 'hidden_iframe';
-    document.body.appendChild(formForm);
-    formForm.submit();
+    const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSelQyzh_lWyb2vZUnQ1jc1p9FLRknDZiUt9NiUiiX1epHTFLw/formResponse";
+    const formBody = new URLSearchParams({
+      "entry.351633352": "Unit 1 (Sections F-J)",
+      "entry.1895948982": studentName,
+      "entry.1232319784": score,
+      "entry.1125920425": tile,
+      "entry.1907417670": loisaiStr
+    });
+    fetch(formUrl, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: formBody.toString()
+    }).catch(e => console.log(e));
 });
 
 document.getElementById('close-modal-btn').addEventListener('click', function() {
