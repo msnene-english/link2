@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="vi">
-<head>
+    <html lang="vi">
+    <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>English Test - Unit 1 (Sections F-J)</title>
@@ -46,6 +46,7 @@
         .rewrite-input { width: 100%; height: 80px; padding: 12px; border: 2px solid #ddd; border-radius: 6px; resize: vertical; font-size: 16px; font-family: inherit; }
         
         .check-btn { margin-top: 15px; background: #3498db; font-size: 14px; padding: 8px 16px; }
+        .inline-check-btn { margin-left: 5px; background: #3498db; font-size: 12px; padding: 6px 10px; }
         .explanation { display: none; margin-top: 15px; padding: 15px; background: #eef2f5; border-radius: 6px; font-size: 14.5px; line-height: 1.5; color: #2c3e50; border-left: 4px solid #2ecc71; }
         
         .progress-bar { width: 100%; height: 10px; background: #ddd; border-radius: 5px; margin-bottom: 20px; overflow: hidden; }
@@ -54,15 +55,15 @@
         .result-details { margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; text-align: left; max-height: 300px; overflow-y: auto; font-size: 14px; }
         .error-item { margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee; color: #e74c3c; }
     </style>
-</head>
-<body>
+    </head>
+    <body>
     <div class="watermark">
-        <div>U1-U2 Đề 1</div>
-        <div>U1-U2 Đề 1</div>
-        <div>U1-U2 Đề 1</div>
-        <div>U1-U2 Đề 1</div>
+        <div>English Test - Unit 1 (Sections F-J)<br>GV biên soạn: Ms Chí Nên - 0852639652</div>
+        <div>English Test - Unit 1 (Sections F-J)<br>GV biên soạn: Ms Chí Nên - 0852639652</div>
+        <div>English Test - Unit 1 (Sections F-J)<br>GV biên soạn: Ms Chí Nên - 0852639652</div>
+        <div>English Test - Unit 1 (Sections F-J)<br>GV biên soạn: Ms Chí Nên - 0852639652</div>
     </div>
-
+    
     <div id="startScreen" class="screen active">
         <h1>English Test - Unit 1 (Sections F-J)</h1>
         <p style="text-align: center; color: #7f8c8d;">Nhập họ và tên của bạn để bắt đầu làm bài</p>
@@ -71,7 +72,7 @@
             <button onclick="startTest()">Bắt đầu làm bài</button>
         </div>
     </div>
-
+    
     <div id="testScreen" class="screen">
         <h2>English Test - Unit 1 (Sections F-J)</h2>
         <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
@@ -80,14 +81,18 @@
             <button id="submitBtn" onclick="confirmSubmit()" style="background: #2ecc71; font-weight: bold; padding: 15px 40px;">NỘP BÀI</button>
         </div>
     </div>
-
+    
     <div id="resultScreen" class="screen" style="text-align: center;">
         <h1 style="color: #2ecc71; font-size: 36px;">Hoàn thành!</h1>
         <h2 id="scoreDisplay" style="font-size: 48px; margin: 20px 0; color: #2c3e50;"></h2>
         <p id="feedbackText" style="font-size: 18px; color: #7f8c8d;"></p>
         <div class="result-details" id="resultDetails"></div>
     </div>
-
+    
+    <div style="text-align: center; margin-top: 50px; padding: 20px; color: #7f8c8d; font-size: 14px; border-top: 1px solid #ddd;">
+        GV biên soạn: Ms Chí Nên - 0852639652
+    </div>
+    
     <script>
         const testName = 'English Test - Unit 1 (Sections F-J)';
         const quizData = [
@@ -191,7 +196,7 @@
                     if (q.blanks) {
                         q.blanks.forEach(b => {
                             let blankStr = '{{blank:' + b.blankId + '}}';
-                            let inpStr = '<input type="text" id="input-' + q.id + '-' + b.blankId + '" class="gap-fill-input" autocomplete="off">';
+                            let inpStr = '<span style="white-space:nowrap;"><input type="text" id="input-' + q.id + '-' + b.blankId + '" class="gap-fill-input" autocomplete="off"><button class="inline-check-btn" onclick="checkSingleBlank(this, \'' + q.id + '\', \'' + b.blankId + '\')">Kiểm tra</button></span>';
                             qText = qText.replace(blankStr, inpStr);
                         });
                     }
@@ -244,7 +249,7 @@
             state[qid].value = q.options[index].label || String.fromCharCode(65 + index);
             updateProgress();
         }
-
+    
         function startTest() {
             const nameInput = document.getElementById('studentName').value.trim();
             if (!nameInput) {
@@ -267,6 +272,33 @@
                 drop.appendChild(chip);
             } else {
                 bank.appendChild(chip);
+            }
+        }
+        
+        function checkSingleBlank(btn, qid, blankId) {
+            const q = quizData.find(x => x.id.toString() === qid.toString());
+            if (!q || !q.blanks) return;
+            const blank = q.blanks.find(b => b.blankId === blankId);
+            if (!blank) return;
+            
+            const input = document.getElementById('input-' + qid + '-' + blankId);
+            let val = input.value.trim().toLowerCase();
+            if (!val) {
+                alert("Vui lòng điền đáp án trước khi kiểm tra!");
+                return;
+            }
+            
+            let isCorrect = blank.correctAnswers.some(ans => ans.toLowerCase() === val);
+            if (isCorrect) {
+                input.style.borderColor = '#2ecc71';
+                input.style.backgroundColor = '#eafaf1';
+                btn.innerHTML = '✔';
+                btn.style.background = '#2ecc71';
+            } else {
+                input.style.borderColor = '#e74c3c';
+                input.style.backgroundColor = '#fdedec';
+                btn.innerHTML = '✘';
+                btn.style.background = '#e74c3c';
             }
         }
         
@@ -355,7 +387,7 @@
                 if (!isCorrect) {
                     errorDetails = 'Câu ' + qid + ': Điền sai. Đáp án đúng: ' + correctAnswersArr.join(', ');
                 }
-                let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>Đáp án đúng:</b><br>' + correctAnswersArr.map((ans, i) => 'Ô ' + (i+1) + ': <b>' + ans + '</b>').join('<br>') + '</div>';
+                let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>Đáp án đúng:</b><br>' + correctAnswersArr.map((ans, i) => (correctAnswersArr.length > 1 ? 'Ô ' + (i+1) + ': ' : '') + '<b>' + ans + '</b>').join('<br>') + '</div>';
                 expl.innerHTML = ansHtml + expl.innerHTML;
             }
             else if (q.type === 'reordering') {
@@ -438,7 +470,8 @@
                 } else {
                     input.style.backgroundColor = '#fdedec';
                     input.style.borderColor = '#e74c3c';
-                    errorDetails = 'Câu viết lại ' + qid + ' sai. Đáp án mẫu:<br><b>' + correctDisplay + '</b>' + (exactMissingPart ? '<br><i>(Hoặc chỉ cần điền: <b>' + exactMissingPart + '</b>)</i>' : '');
+                    let displayExact = exactMissingPart && (normalize(exactMissingPart.toLowerCase()) !== normalize(correctDisplay.toLowerCase()));
+                    errorDetails = 'Câu viết lại ' + qid + ' sai. Đáp án mẫu:<br><b>' + correctDisplay + '</b>' + (displayExact ? '<br><i>(Hoặc chỉ cần điền: <b>' + exactMissingPart + '</b>)</i>' : '');
                 }
                 
                 let firstMissingPart = '';
@@ -457,7 +490,8 @@
                     if (partialAns) firstMissingPart = partialAns;
                 }
                 
-                let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>Đáp án đúng:</b><br>' + correctDisplay + (firstMissingPart ? '<br><i>(Hoặc chỉ cần điền: <b>' + firstMissingPart + '</b>)</i>' : '') + '</div>';
+                let displayMissing = firstMissingPart && (normalize(firstMissingPart.toLowerCase()) !== normalize(correctDisplay.toLowerCase()));
+                let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>Đáp án đúng:</b><br>' + correctDisplay + (displayMissing ? '<br><i>(Hoặc chỉ cần điền: <b>' + firstMissingPart + '</b>)</i>' : '') + '</div>';
                 expl.innerHTML = ansHtml + expl.innerHTML;
             }
             
@@ -520,7 +554,8 @@
             const formData = new FormData();
             formData.append('entry.1861648410', studentName);
             formData.append('entry.1691800437', score.toFixed(2));
-            formData.append('entry.639295732', errorReport);
+            const plainErrorReport = errorReport.replace(/<[^>]*>?/gm, '');
+            formData.append('entry.639295732', plainErrorReport);
             formData.append('entry.370465671', testName);
             
             fetch(formUrl, {
@@ -537,5 +572,6 @@
         
         init();
     </script>
-</body>
-</html>
+    </body>
+    </html>
+    
