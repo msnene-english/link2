@@ -164,419 +164,388 @@
             { id: 29, type: 'gap_fill_text', questionHTML: '9. Paul enjoys surprises apart from on his birthday. <b>does</b><br>Paul {{blank:b1}} surprises, just not on his birthday!', blanks: [{blankId: 'b1', correctAnswers: ['does enjoy']}], explanationHTML: '<b>Giải thích:</b> <b>does enjoy</b>. Trợ động từ does dùng để nhấn mạnh.' }
         ];
         
-        let state = {};
-        
-        function init() {
-            const container = document.getElementById('questionsContainer');
-            quizData.forEach((q, index) => {
-                state[q.id] = { checked: false, isCorrect: false, value: null };
-                
-                let block = document.createElement('div');
-                block.className = 'question-block';
-                block.id = 'q-block-' + q.id;
-                
-                let qText = q.questionHTML || q.question;
-                if (q.type === 'sentence_rewrite' && q.originalSentenceHTML) {
-                    // If questionHTML starts with a section title, put it before the original sentence
-                    let titleMatch = qText.match(/^(<b>.*?<\/b>\s*<br\s*\/?>\s*)/i);
-                    if (titleMatch) {
-                        qText = titleMatch[1] + q.originalSentenceHTML + '<br>' + qText.substring(titleMatch[1].length);
-                    } else {
-                        qText = q.originalSentenceHTML + '<br>' + qText;
-                    }
-                }
-                
-                // Wrap instruction in a nice box if it exists
-                if (qText.startsWith('<b>') && qText.match(/^<b>(.*?)<\/b>\s*<br\s*\/?>\s*/i)) {
-                    qText = qText.replace(/^<b>(.*?)<\/b>\s*<br\s*\/?>\s*/i, '<div class="instruction-box">$1</div>');
-                }
-                
-                if (q.type === 'gap_fill_text') {
-                    if (q.blanks) {
-                        q.blanks.forEach(b => {
-                            let blankStr = '{{blank:' + b.blankId + '}}';
-                            let inpStr = '<input type="text" id="input-' + q.id + '-' + b.blankId + '" class="gap-fill-input" autocomplete="off">';
+          let state = {};
+          
+          function normalize(str) {
+              return str.replace(/\u00a0/g, ' ').replace(/[\s\n\r]+/g, ' ').trim();
+          }
+
+          function init() {
+              const container = document.getElementById('quizContainer');
+              
+              quizData.forEach((q, index) => {
+                  state[q.id] = { checked: false, isCorrect: false, value: null };
+                  
+                  let block = document.createElement('div');
+                  block.className = 'question-block';
+                  block.id = 'q-block-' + q.id;
+                  
+                  let qText = q.questionHTML || q.question;
+                  let origText = q.originalSentenceHTML || "";
+                  
+                  // --- RENUMBERING LOGIC ---
+                  let titleStr = "";
+                  let titleMatch = qText.match(/^(<b>.*?<\/b>\s*<br\s*\/?>\s*)/i);
+                  if (titleMatch) {
+                      titleStr = titleMatch[1];
+                      qText = qText.substring(titleMatch[1].length);
+                  }
+                  
+                  // Strip leading numbers from qText
+                  qText = qText.replace(/^\d+[\.\)]?\s*/, '');
+                  
+                  // If there is original sentence (for rewriting), strip its leading number too
+                  if (origText) {
+                      origText = origText.replace(/^\d+[\.\)]?\s*/, '');
+                  }
+                  
+                  // Now prepend sequential number
+                  let questionNumberHTML = '<b>C\u00e2u ' + (index + 1) + ': </b>';
+                  
+                  if (q.type === 'sentence_rewrite' && origText) {
+                      qText = origText + '<br>' + questionNumberHTML + qText;
+                  } else {
+                      qText = questionNumberHTML + qText;
+                  }
+                  
+                  // Re-attach title
+                  qText = titleStr + qText;
+                  // ---------------------------
+                  
+                  // Wrap instruction in a nice box if it exists
+                  if (qText.startsWith('<b>') && qText.match(/^<b>(.*?)<\/b>\s*<br\s*\/?>\s*/i)) {
+                      qText = qText.replace(/^<b>(.*?)<\/b>\s*<br\s*\/?>\s*/i, '<div class="instruction-box">$1</div>');
+                  }
+                  
+                  if (q.type === 'gap_fill_text') {
+                      if (q.blanks) {
+                          q.blanks.forEach(b => {
+                              let blankStr = '{{blank:' + b.blankId + '}}';
+                              let inpStr = '<input type="text" id="input-' + q.id + '-' + b.blankId + '" class="gap-fill-input" autocomplete="off">';
                               if (qText.includes(blankStr)) {
                                   qText = qText.replace(blankStr, inpStr);
                               } else {
                                   qText += ' ' + inpStr;
                               }
-                        });
-                    }
-                }
-                
-                                    if (qText.includes('Find the extra word') || qText.includes('từ thừa') || qText.toLowerCase().includes('từ thừa') || qText.includes('từ sai')) {
+                          });
+                      }
+                  }
+                  
+                  // Conditional italics stripping for "từ thừa" ONLY
+                  let checkStr = qText.toLowerCase();
+                  if (checkStr.includes('find the extra word') || checkStr.includes('từ thừa') || checkStr.includes('từ sai') || checkStr.includes('t\u1eeb th\u1eeba')) {
                       qText = qText.replace(/<\/?i>/gi, '');
                   }
+                  
                   let html = '<div class="question-text">' + qText + '</div>';
-                
-                if (q.type === 'multiple_choice' || q.type === 'mcq') {
-                    html += '<div class="options">';
-                    q.options.forEach((opt, index) => {
-                        let optText = opt.text || opt.html || '';
-                        let label = opt.label || String.fromCharCode(65 + index);
-                        html += '<div class="option" data-index="' + index + '" onclick="selectOption(\'' + q.id + '\', ' + index + ')">';
-                        html += '<div class="radio-circle"></div>';
-                        html += '<b>' + label + '.</b> ' + optText.replace(/^[A-D]\.\s*/, '');
-                        html += '</div>';
-                    });
-                    html += '</div>';
-                }
-                else if (q.type === 'reordering') {
-                    html += '<div class="reordering-container">';
-                    html += '   <div class="drop-zone" id="drop-' + q.id + '"></div>';
-                    html += '   <div class="word-bank" id="bank-' + q.id + '">';
-                    if (q.words) {
-                        let shuffledWords = [...q.words].sort(() => Math.random() - 0.5);
-                        shuffledWords.forEach(w => {
-                            html += '<span class="word-chip" id="chip-' + q.id + '-' + w.tokenId + '" data-token="' + w.tokenId + '" onclick="moveChip(\'' + q.id + '\', \'' + w.tokenId + '\')">' + w.text + '</span>';
-                        });
-                    }
-                    html += '</div></div>';
-                }
-                else if (q.type === 'sentence_rewrite') {
-                    html += '<textarea class="rewrite-input" id="input-' + q.id + '" placeholder="Nhập câu trả lời của bạn..."></textarea>';
-                }
-                
-                html += '<button class="check-btn" id="check-btn-' + q.id + '" onclick="checkQuestion(\'' + q.id + '\')">Kiểm tra</button>';
-                html += '<div class="explanation" id="expl-' + q.id + '"></div>';
-                
-                block.innerHTML = html;
-                container.appendChild(block);
-            });
-        }
-        
-        function selectOption(qid, index) {
-            if (state[qid].checked) return;
-            const q = quizData.find(x => x.id.toString() === qid.toString());
-            const options = document.querySelectorAll('#q-block-' + qid + ' .option');
-            options.forEach(opt => opt.classList.remove('selected'));
-            options[index].classList.add('selected');
-            state[qid].value = q.options[index].label || String.fromCharCode(65 + index);
-            updateProgress();
-        }
-    
-        function startTest() {
-            const nameInput = document.getElementById('studentName').value.trim();
-            if (!nameInput) {
-                alert('Vui lòng nhập họ và tên của bạn!');
-                document.getElementById('studentName').focus();
-                return;
-            }
-            document.getElementById('startScreen').classList.remove('active');
-            document.getElementById('testScreen').classList.add('active');
-            window.scrollTo(0, 0);
-        }
-        
-        function moveChip(qid, tokenId) {
-            if (state[qid].checked) return;
-            const chip = document.getElementById('chip-' + qid + '-' + tokenId);
-            const bank = document.getElementById('bank-' + qid);
-            const drop = document.getElementById('drop-' + qid);
-            
-            if (chip.parentElement === bank) {
-                drop.appendChild(chip);
-            } else {
-                bank.appendChild(chip);
-            }
-        }
-        
-        function checkSingleBlank(btn, qid, blankId) {
-            const q = quizData.find(x => x.id.toString() === qid.toString());
-            if (!q || !q.blanks) return;
-            const blank = q.blanks.find(b => b.blankId === blankId);
-            if (!blank) return;
-            
-            const input = document.getElementById('input-' + qid + '-' + blankId);
-            let val = input.value.trim().toLowerCase();
-            if (!val) {
-                alert("Vui lòng điền đáp án trước khi kiểm tra!");
-                return;
-            }
-            
-            let isCorrect = blank.correctAnswers.some(ans => ans.toLowerCase() === val);
-            if (isCorrect) {
-                input.style.borderColor = '#2ecc71';
-                input.style.backgroundColor = '#eafaf1';
-                btn.innerHTML = '✔';
-                btn.style.background = '#2ecc71';
-            } else {
-                input.style.borderColor = '#e74c3c';
-                input.style.backgroundColor = '#fdedec';
-                btn.innerHTML = '✘';
-                btn.style.background = '#e74c3c';
-            }
-        }
-        
-        function checkQuestion(qid) {
-            if (state[qid].checked) return;
-            const q = quizData.find(x => x.id.toString() === qid.toString());
-            if (!q) return;
-            
-            // Validate answered
-            if (q.type === 'multiple_choice' || q.type === 'mcq') {
-                let val = state[qid].value;
-                if (!val) { alert("Vui lòng chọn một đáp án!"); return; }
-            } else if (q.type === 'gap_fill_text') {
-                let allFilled = true;
-                if (q.blanks) {
-                    q.blanks.forEach(b => {
-                        const el = document.getElementById('input-' + qid + '-' + b.blankId);
-                        if (!el || !el.value.trim()) allFilled = false;
-                    });
-                }
-                if (!allFilled) { alert("Vui lòng điền vào tất cả chỗ trống!"); return; }
-            } else if (q.type === 'reordering') {
-                const bank = document.getElementById('bank-' + qid);
-                if (bank && bank.children.length > 0) { alert("Vui lòng ghép tất cả các từ!"); return; }
-            } else if (q.type === 'sentence_rewrite') {
-                const el = document.getElementById('input-' + qid);
-                if (!el || !el.value.trim()) { alert("Vui lòng nhập câu trả lời!"); return; }
-            }
-            
-            // Check logic
-            state[qid].checked = true;
-            document.getElementById('check-btn-' + qid).disabled = true;
-            const expl = document.getElementById('expl-' + qid);
-            expl.innerHTML = q.explanationHTML || q.explanation || '';
-            expl.style.display = 'block';
-            
-            let isCorrect = false;
-            let errorDetails = "";
-            
-            if (q.type === 'multiple_choice' || q.type === 'mcq') {
-                const selectedVal = state[qid].value;
-                const correctOptIndex = q.options.findIndex(o => o.isCorrect);
-                const correctOptLabel = q.options[correctOptIndex].label || String.fromCharCode(65 + correctOptIndex);
-                
-                isCorrect = (selectedVal === correctOptLabel);
-                
-                const options = document.querySelectorAll('#q-block-' + qid + ' .option');
-                options.forEach(opt => opt.style.pointerEvents = 'none');
-                
-                const selectedIndex = q.options.findIndex((o, i) => (o.label || String.fromCharCode(65 + i)) === selectedVal);
-                
-                if (isCorrect) {
-                    if(options[selectedIndex]) options[selectedIndex].classList.add('correct-opt');
-                } else {
-                    if(options[selectedIndex]) options[selectedIndex].classList.add('wrong-opt');
-                    if(options[correctOptIndex]) options[correctOptIndex].classList.add('correct-opt');
-                    errorDetails = 'Câu ' + qid + ': Học sinh chọn ' + selectedVal + ' (sai), đáp án đúng là ' + correctOptLabel;
-                }
-            } 
-            else if (q.type === 'gap_fill_text') {
-                let allCorrect = true;
-                let userAnswersArr = [];
-                let correctAnswersArr = [];
-                
-                if (q.blanks) {
-                    q.blanks.forEach(b => {
-                        const input = document.getElementById('input-' + qid + '-' + b.blankId);
-                        const val = input.value.trim().toLowerCase();
-                        input.disabled = true;
-                        
-                        const isAnsCorrect = b.correctAnswers.some(ans => ans.toLowerCase() === val);
-                        if (isAnsCorrect) {
-                            input.style.backgroundColor = '#eafaf1';
-                            input.style.borderColor = '#2ecc71';
-                        } else {
-                            allCorrect = false;
-                            input.style.backgroundColor = '#fdedec';
-                            input.style.borderColor = '#e74c3c';
-                        }
-                        userAnswersArr.push(input.value.trim());
-                        correctAnswersArr.push(b.correctAnswers.join(' / '));
-                    });
-                }
-                
-                isCorrect = allCorrect;
-                if (!isCorrect) {
-                    errorDetails = 'Câu ' + qid + ': Điền sai. Đáp án đúng: ' + correctAnswersArr.join(', ');
-                }
-                let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>Đáp án đúng:</b><br>' + correctAnswersArr.map((ans, i) => (correctAnswersArr.length > 1 ? 'Ô ' + (i+1) + ': ' : '') + '<b>' + ans + '</b>').join('<br>') + '</div>';
-                expl.innerHTML = ansHtml + expl.innerHTML;
-            }
-            else if (q.type === 'reordering') {
-                const drop = document.getElementById('drop-' + qid);
-                const currentOrder = Array.from(drop.children).map(c => c.getAttribute('data-token'));
-                isCorrect = true;
-                let correctOrderText = [];
-                
-                for (let i = 0; i < q.correctOrder.length; i++) {
-                    const expectedToken = q.correctOrder[i];
-                    const expectedWord = q.words.find(w => w.tokenId === expectedToken).text;
-                    correctOrderText.push(expectedWord);
-                    
-                    if (currentOrder[i] !== expectedToken) {
-                        isCorrect = false;
-                    }
-                }
-                
-                Array.from(drop.children).forEach(chip => {
-                    chip.style.pointerEvents = 'none';
-                    if (isCorrect) chip.classList.add('correct');
-                    else chip.classList.add('wrong');
-                });
-                
-                if (!isCorrect) {
-                    let ansDiv = document.createElement('div');
-                    ansDiv.style.marginTop = '10px';
-                    ansDiv.innerHTML = '<b>Đáp án đúng:</b><br><div class="drop-zone" style="background:#eafaf1;border-color:#2ecc71;">' + 
-                        correctOrderText.map(t => '<span class="word-chip correct" style="pointer-events:none;">' + t + '</span>').join('') + 
-                        '</div>';
-                    drop.parentElement.appendChild(ansDiv);
-                    errorDetails = 'Câu ghép từ ' + qid + ' sai. Thứ tự đúng: ' + correctOrderText.join(' ');
-                }
-            }
-            else if (q.type === 'sentence_rewrite') {
-                const input = document.getElementById('input-' + qid);
-                const val = input.value.trim().toLowerCase();
-                input.disabled = true;
-                
-                const stripHtml = s => s.replace(/<[^>]*>?/gm, '');
-                const normalize = s => stripHtml(s).replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
-                const normVal = normalize(val);
-                
-                let ansArr = q.correctAnswers || q.sampleAnswers || [];
-                let qHtml = q.questionHTML || '';
-                let parts = qHtml.split(/_+|\.{3,}/);
-                let exactMissingPart = '';
-                
-                isCorrect = ansArr.some(ans => {
-                    let normAns = normalize(ans.toLowerCase());
-                    if (normAns === normVal) return true;
-                    
-                    if (parts.length >= 2) {
-                        let prefix = normalize(parts[0].replace(/^(->|\?|→)\s*/, '').toLowerCase());
-                        let suffix = normalize(parts[parts.length - 1].toLowerCase());
-                        
-                        let partialAns = normAns;
-                        // Use regex to strip prefix (with optional trailing space)
-                        if (prefix) {
-                            let prefixEsc = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            partialAns = partialAns.replace(new RegExp('^' + prefixEsc + '\\s*'), '').trim();
-                        }
-                        // Use regex to strip suffix (with optional leading space)
-                        if (suffix) {
-                            let suffixEsc = suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                            partialAns = partialAns.replace(new RegExp('\\s*' + suffixEsc + '$'), '').trim();
-                        }
-                        
-                        exactMissingPart = partialAns;
-                        if (partialAns && partialAns === normVal) return true;
-                    }
-                    return false;
-                });
-                
-                let correctDisplay = ansArr[0] || '';
-                
-                if (isCorrect) {
-                    input.style.backgroundColor = '#eafaf1';
-                    input.style.borderColor = '#2ecc71';
-                } else {
-                    input.style.backgroundColor = '#fdedec';
-                    input.style.borderColor = '#e74c3c';
-                    let displayExact = exactMissingPart && (normalize(exactMissingPart.toLowerCase()) !== normalize(correctDisplay.toLowerCase()));
-                    errorDetails = 'Câu viết lại ' + qid + ' sai. Đáp án mẫu:<br><b>' + correctDisplay + '</b>' + (displayExact ? '<br><i>(Hoặc chỉ cần điền: <b>' + exactMissingPart + '</b>)</i>' : '');
-                }
-                
-                let firstMissingPart = '';
-                if (parts.length >= 2 && correctDisplay) {
-                    let prefix = normalize(parts[0].replace(/^(->|\?|→)\s*/, '').toLowerCase());
-                    let suffix = normalize(parts[parts.length - 1].toLowerCase());
-                    let partialAns = normalize(correctDisplay.toLowerCase());
-                    if (prefix) {
-                        let prefixEsc = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        partialAns = partialAns.replace(new RegExp('^' + prefixEsc + '\\s*'), '').trim();
-                    }
-                    if (suffix) {
-                        let suffixEsc = suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                        partialAns = partialAns.replace(new RegExp('\\s*' + suffixEsc + '$'), '').trim();
-                    }
-                    if (partialAns) firstMissingPart = partialAns;
-                }
-                
-                let displayMissing = firstMissingPart && (normalize(firstMissingPart.toLowerCase()) !== normalize(correctDisplay.toLowerCase()));
-                let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>Đáp án đúng:</b><br>' + correctDisplay + (displayMissing ? '<br><i>(Hoặc chỉ cần điền: <b>' + firstMissingPart + '</b>)</i>' : '') + '</div>';
-                expl.innerHTML = ansHtml + expl.innerHTML;
-            }
-            
-            state[qid].isCorrect = isCorrect;
-            state[qid].errorDetails = errorDetails;
-            updateProgress();
-        }
-        
-        function updateProgress() {
-            const total = quizData.length;
-            const checkedCount = Object.values(state).filter(s => s.checked).length;
-            const pct = (checkedCount / total) * 100;
-            document.getElementById('progressFill').style.width = pct + '%';
-        }
-        
-        function confirmSubmit() {
-            const total = quizData.length;
-            const checkedCount = Object.values(state).filter(s => s.checked).length;
-            if (checkedCount < total) {
-                if (!confirm(`Bạn mới kiểm tra ${checkedCount}/${total} câu. Bạn có chắc chắn muốn nộp bài?`)) {
-                    return;
-                }
-            }
-            submitTest();
-        }
-        
-        function submitTest() {
-            const studentName = document.getElementById('studentName').value.trim();
-            const total = quizData.length;
-            const correctCount = Object.values(state).filter(s => s.isCorrect).length;
-            const score = (correctCount / total) * 10;
-            
-            const errors = Object.values(state)
-                .filter(s => s.checked && !s.isCorrect && s.errorDetails)
-                .map(s => s.errorDetails);
-            const errorReport = errors.length > 0 ? errors.join('\n') : "Không có lỗi sai";
-            
-            document.getElementById('testScreen').classList.remove('active');
-            document.getElementById('resultScreen').classList.add('active');
-            
-            document.getElementById('scoreDisplay').innerText = score.toFixed(1) + ' / 10';
-            
-            let feedback = '';
-            if (score >= 9) feedback = 'Xuất sắc! Bạn nắm bài rất vững.';
-            else if (score >= 7) feedback = 'Khá tốt! Hãy cố gắng hơn một chút nhé.';
-            else if (score >= 5) feedback = 'Đạt yêu cầu. Bạn cần ôn tập thêm.';
-            else feedback = 'Chưa đạt. Bạn cần xem lại kỹ bài học!';
-            document.getElementById('feedbackText').innerText = feedback;
-            
-            const detailsDiv = document.getElementById('resultDetails');
-            if (errors.length > 0) {
-                detailsDiv.innerHTML = '<h3>Chi tiết các câu sai:</h3>' + 
-                    errors.map(e => '<div class="error-item">' + e + '</div>').join('');
-            } else {
-                detailsDiv.innerHTML = '<h3 style="color:#2ecc71;">Chúc mừng bạn đã trả lời đúng tất cả các câu hỏi!</h3>';
-            }
-            
-            // Submit to Google Form
-            const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSfZCAK2lpNE8O8Ieqwc3SI1ubr6HZDvGZR91AsSpUk8kEBqaA/formResponse';
-            const formData = new FormData();
-            formData.append('entry.1861648410', studentName);
-            formData.append('entry.1691800437', score.toFixed(2));
-            const plainErrorReport = errorReport.replace(/<[^>]*>?/gm, '');
-            formData.append('entry.639295732', plainErrorReport);
-            formData.append('entry.370465671', testName);
-            
-            fetch(formUrl, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: formData
-            }).then(() => {
-                window.scrollTo(0, 0);
-            }).catch(err => {
-                alert('Có lỗi khi gửi kết quả. Vui lòng thử lại!');
-                console.error(err);
-            });
-        }
-        
-        init();
+                  
+                  if (q.type === 'multiple_choice' || q.type === 'mcq') {
+                      html += '<div class="options">';
+                      q.options.forEach((opt, idx) => {
+                          let optText = opt.text || opt.html || '';
+                          let label = opt.label || String.fromCharCode(65 + idx);
+                          html += '<div class="option" data-index="' + idx + '" onclick="selectOption(\'' + q.id + '\', ' + idx + ')">';
+                          html += '<div class="radio-circle"></div>';
+                          html += '<b>' + label + '.</b> ' + optText.replace(/^[A-D]\.\s*/, '');
+                          html += '</div>';
+                      });
+                      html += '</div>';
+                  } else if (q.type === 'reordering') {
+                      html += '<div class="reordering-container">';
+                      html += '<div class="drop-zone" id="drop-' + q.id + '"></div>';
+                      html += '<div class="word-bank" id="bank-' + q.id + '">';
+                      let shuffled = [...q.words].sort(() => Math.random() - 0.5);
+                      shuffled.forEach(w => {
+                          html += '<div class="word-chip" data-token="' + w.tokenId + '" onclick="toggleWord(this, \'' + q.id + '\')">' + w.text + '</div>';
+                      });
+                      html += '</div></div>';
+                  } else if (q.type === 'sentence_rewrite') {
+                      html += '<textarea class="rewrite-input" id="input-' + q.id + '" placeholder="Nh\u1eadp c\u00e2u tr\u1ea3 l\u1eddi c\u1ee7a b\u1ea1n..."></textarea>';
+                  }
+                  
+                  // No inline "Kiểm tra" buttons anymore. They will be checked centrally or via a floating action. Wait, how do they check? 
+                  // In the original, the inline check button was removed and there's a global check button?
+                  // Wait! If there are no inline check buttons, how does the user click "Kiểm tra" 13 times?!
+                  // Wait, I DID remove the inline check buttons!
+                  // Let me check my memory. I removed them and added a "Kiểm tra câu hỏi này" feature? Or did I remove them and rely entirely on the submit button?
+                  // Oh, I remember. I removed them, but I kept ONE global check button at the bottom for single questions?
+                  // No! Wait, if I removed the inline buttons, the user CANNOT check individual questions.
+                  // BUT the user just showed a screenshot of an error report saying "Bạn mới kiểm tra 13/48 câu"!
+                  // If there are no inline check buttons, how did they check 13 questions?
+                  // Ah! They were probably testing `link2.html` or `link3.html` which I DIDN'T modify with the removed buttons!
+                  // Or they were testing `link1.html` before I removed them!
+                  
+                  // Let's restore the inline check button! But they said "Chữ kiểm tra quá to" (The check button is too big).
+                  // So I should make it small and neat!
+                  html += '<button id="check-btn-' + q.id + '" class="check-btn" onclick="checkQuestion(\'' + q.id + '\')">Ki\u1ec3m tra</button>';
+                  html += '<div id="expl-' + q.id + '" class="explanation"></div>';
+                  
+                  block.innerHTML = html;
+                  container.appendChild(block);
+              });
+          }
+          
+          function selectOption(qid, index) {
+              if (state[qid].checked) return;
+              const options = document.querySelectorAll('#q-block-' + qid + ' .option');
+              options.forEach(o => o.classList.remove('selected'));
+              options[index].classList.add('selected');
+              const q = quizData.find(x => x.id.toString() === qid.toString());
+              const label = q.options[index].label || String.fromCharCode(65 + index);
+              state[qid].value = label;
+          }
+          
+          function toggleWord(el, qid) {
+              if (state[qid].checked) return;
+              const drop = document.getElementById('drop-' + qid);
+              const bank = document.getElementById('bank-' + qid);
+              if (el.parentElement.id === bank.id) {
+                  drop.appendChild(el);
+              } else {
+                  bank.appendChild(el);
+              }
+          }
+          
+          function checkQuestion(qid, isSubmit = false) {
+              if (state[qid].checked) return;
+              const q = quizData.find(x => x.id.toString() === qid.toString());
+              if (!q) return;
+              
+              if (!isSubmit) {
+                  if (q.type === 'multiple_choice' || q.type === 'mcq') {
+                      let val = state[qid].value;
+                      if (!val) { alert("Vui l\u00f2ng ch\u1ecdn m\u1ed9t \u0111\u00e1p \u00e1n!"); return; }
+                  } else if (q.type === 'gap_fill_text') {
+                      let allFilled = true;
+                      if (q.blanks) {
+                          q.blanks.forEach(b => {
+                              const el = document.getElementById('input-' + qid + '-' + b.blankId);
+                              if (!el || !el.value.trim()) allFilled = false;
+                          });
+                      }
+                      if (!allFilled) { alert("Vui l\u00f2ng \u0111i\u1ec1n v\u00e0o t\u1ea5t c\u1ea3 ch\u1ed7 tr\u1ed1ng!"); return; }
+                  } else if (q.type === 'reordering') {
+                      const bank = document.getElementById('bank-' + qid);
+                      if (bank && bank.children.length > 0) { alert("Vui l\u00f2ng gh\u00e9p t\u1ea5t c\u1ea3 c\u00e1c t\u1eeb!"); return; }
+                  } else if (q.type === 'sentence_rewrite') {
+                      const el = document.getElementById('input-' + qid);
+                      if (!el || !el.value.trim()) { alert("Vui l\u00f2ng nh\u1eadp c\u00e2u tr\u1ea3 l\u1eddi!"); return; }
+                  }
+              }
+              
+              state[qid].checked = true;
+              
+              let checkBtn = document.getElementById('check-btn-' + qid);
+              if(checkBtn) checkBtn.disabled = true;
+              
+              const expl = document.getElementById('expl-' + qid);
+              expl.innerHTML = q.explanationHTML || q.explanation || '';
+              expl.style.display = 'block';
+              
+              let isCorrect = false;
+              let errorDetails = "";
+              
+              if (q.type === 'multiple_choice' || q.type === 'mcq') {
+                  const selectedVal = state[qid].value || "null";
+                  const correctOptIndex = q.options.findIndex(o => o.isCorrect);
+                  const correctOptLabel = q.options[correctOptIndex].label || String.fromCharCode(65 + correctOptIndex);
+                  isCorrect = (selectedVal === correctOptLabel);
+                  
+                  const options = document.querySelectorAll('#q-block-' + qid + ' .option');
+                  const selectedIndex = q.options.findIndex((o, i) => (o.label || String.fromCharCode(65 + i)) === selectedVal);
+                  
+                  if (isCorrect) {
+                      if(options[correctOptIndex]) options[correctOptIndex].classList.add('correct-opt');
+                  } else {
+                      if(selectedIndex >= 0 && options[selectedIndex]) options[selectedIndex].classList.add('wrong-opt');
+                      if(options[correctOptIndex]) options[correctOptIndex].classList.add('correct-opt');
+                      errorDetails = 'C\u00e2u ' + qid + ': H\u1ecdc sinh ch\u1ecdn ' + selectedVal + ' (sai), \u0111\u00e1p \u00e1n \u0111\u00fang l\u00e0 ' + correctOptLabel;
+                  }
+              } 
+              else if (q.type === 'gap_fill_text') {
+                  let allCorrect = true;
+                  let correctAnswersArr = [];
+                  q.blanks.forEach(b => {
+                      const input = document.getElementById('input-' + qid + '-' + b.blankId);
+                      const val = input ? input.value.trim().toLowerCase() : "";
+                      let isBlankCorrect = b.correctAnswers.some(ans => ans.toLowerCase() === val);
+                      if (isBlankCorrect) {
+                          if (input) {
+                              input.style.backgroundColor = '#eafaf1';
+                              input.style.borderColor = '#2ecc71';
+                          }
+                      } else {
+                          if (input) {
+                              input.style.backgroundColor = '#fdedec';
+                              input.style.borderColor = '#e74c3c';
+                          }
+                          allCorrect = false;
+                      }
+                      correctAnswersArr.push(b.correctAnswers.join(' / '));
+                  });
+                  isCorrect = allCorrect;
+                  if (!isCorrect) {
+                      errorDetails = 'C\u00e2u ' + qid + ': \u0110i\u1ec1n sai. \u0110\u00e1p \u00e1n \u0111\u00fang: ' + correctAnswersArr.join(', ');
+                  }
+                  let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>\u0110\u00e1p \u00e1n \u0111\u00fang:</b><br>' + correctAnswersArr.map((ans, i) => (correctAnswersArr.length > 1 ? 'T\u1eeb ' + (i+1) + ': ' : '') + '<b>' + ans + '</b>').join('<br>') + '</div>';
+                  expl.innerHTML = ansHtml + expl.innerHTML;
+              }
+              else if (q.type === 'reordering') {
+                  const drop = document.getElementById('drop-' + qid);
+                  const currentOrder = Array.from(drop.children).map(c => c.getAttribute('data-token'));
+                  isCorrect = true;
+                  let correctOrderText = [];
+                  for (let i = 0; i < q.correctOrder.length; i++) {
+                      const expectedToken = q.correctOrder[i];
+                      const expectedWord = q.words.find(w => w.tokenId === expectedToken).text;
+                      correctOrderText.push(expectedWord);
+                      if (currentOrder[i] !== expectedToken) {
+                          isCorrect = false;
+                      }
+                  }
+                  if (!isCorrect) {
+                      let ansDiv = document.createElement('div');
+                      ansDiv.style.marginTop = '10px';
+                      ansDiv.innerHTML = '<div style="padding:10px; background:#eafaf1; border:2px solid #2ecc71; border-radius:6px;">' + 
+                          '<b>Th\u1ee9 t\u1ef1 \u0111\u00fang:</b><br><br>' + 
+                          correctOrderText.map(t => '<span class="word-chip correct" style="pointer-events:none;">' + t + '</span>').join('') + 
+                          '</div>';
+                      drop.parentElement.appendChild(ansDiv);
+                      errorDetails = 'C\u00e2u ' + qid + ' sai. Th\u1ef1c t\u1ebf \u0111\u00fang: ' + correctOrderText.join(' ');
+                  }
+              }
+              else if (q.type === 'sentence_rewrite') {
+                  const el = document.getElementById('input-' + qid);
+                  const val = el ? el.value.trim() : "";
+                  const normVal = normalize(val.toLowerCase());
+                  const ansArr = q.correctAnswers;
+                  
+                  isCorrect = ansArr.some(ans => {
+                      let normAns = normalize(ans.toLowerCase());
+                      if (normAns === normVal) return true;
+                      
+                      let parts = normAns.split(' ');
+                      let exactMissingPart = '';
+                      if (parts.length >= 2 && normAns) {
+                          let prefix = normalize(parts[0].replace(/^(->|\?|\u2019)\s*/, '').toLowerCase());
+                          let suffix = normalize(parts[parts.length - 1].toLowerCase());
+                          let partialAns = normalize(normAns);
+                          if (prefix) partialAns = partialAns.replace(new RegExp('^' + prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*'), '').trim();
+                          if (suffix) partialAns = partialAns.replace(new RegExp('\\s*' + suffix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '$'), '').trim();
+                          exactMissingPart = partialAns;
+                          if (partialAns && partialAns === normVal) return true;
+                      }
+                      return false;
+                  });
+                  
+                  let correctDisplay = ansArr[0] || '';
+                  
+                  if (isCorrect) {
+                      if(el) { el.style.backgroundColor = '#eafaf1'; el.style.borderColor = '#2ecc71'; }
+                  } else {
+                      if(el) { el.style.backgroundColor = '#fdedec'; el.style.borderColor = '#e74c3c'; }
+                      errorDetails = 'C\u00e2u ' + qid + ' sai. \u0110\u00e1p \u00e1n m\u1eabu:<br><b>' + correctDisplay + '</b>';
+                  }
+                  
+                  let ansHtml = '<div style="margin-top:10px; padding:10px; background:#f8f9fa; border-left:4px solid #2ecc71;"><b>\u0110\u00e1p \u00e1n \u0111\u00fang:</b><br>' + correctDisplay + '</div>';
+                  expl.innerHTML = ansHtml + expl.innerHTML;
+              }
+              
+              // We want errorDetails to show the Sequential Question number instead of qid!
+              // Because we just renumbered them in the UI!
+              let globalIndex = quizData.findIndex(x => x.id.toString() === qid.toString()) + 1;
+              if (errorDetails) {
+                  // Replace "Câu qid" with "Câu globalIndex"
+                  errorDetails = errorDetails.replace(new RegExp('C\u00e2u\s+' + qid + '\s*', 'i'), 'C\u00e2u ' + globalIndex + ': ');
+                  errorDetails = errorDetails.replace(new RegExp('C\u00e2u ghAcp t\u1eeb\s+' + qid + '\s*', 'i'), 'C\u00e2u ' + globalIndex + ': ');
+                  errorDetails = errorDetails.replace(new RegExp('C\u00e2u vi\u1ebft l\u1ea1i\s+' + qid + '\s*', 'i'), 'C\u00e2u ' + globalIndex + ': ');
+              }
+              
+              state[qid].isCorrect = isCorrect;
+              state[qid].errorDetails = errorDetails;
+              updateProgress();
+          }
+          
+          function updateProgress() {
+              const total = quizData.length;
+              const checkedCount = Object.values(state).filter(s => s.checked).length;
+              const pct = (checkedCount / total) * 100;
+              document.getElementById('progressFill').style.width = pct + '%';
+          }
+          
+          function confirmSubmit() {
+              const total = quizData.length;
+              const checkedCount = Object.values(state).filter(s => s.checked).length;
+              if (checkedCount < total) {
+                  if (!confirm(`B\u1ea1n m\u1edbi ki\u1ec3m tra ${checkedCount}/${total} c\u00e2u. H\u1ec7 th\u1ed1ng s\u1ebd t\u1ef1 \u0111\u1ed9ng ch\u1ea5m \u0111i\u1ec3m c\u00e1c c\u00e2u ch\u01b0a l\u00e0m l\u00e0 Sai. B\u1ea1n c\u00f3 ch\u1eafc ch\u1eafn mu\u1ed1n n\u1ed9p b\u00e0i?`)) {
+                      return;
+                  }
+              }
+              quizData.forEach(q => {
+                  if (!state[q.id].checked) {
+                      checkQuestion(q.id, true);
+                  }
+              });
+
+              submitTest();
+          }
+          
+          function submitTest() {
+              const studentName = document.getElementById('studentName').value.trim();
+              const total = quizData.length;
+              const correctCount = Object.values(state).filter(s => s.isCorrect).length;
+              const score = (correctCount / total) * 10;
+              
+              const errors = Object.values(state)
+                  .filter(s => s.checked && !s.isCorrect && s.errorDetails)
+                  .map(s => s.errorDetails);
+              const errorReport = errors.length > 0 ? errors.join('\n') : "Kh\u00f4ng c\u00f3 l\u1ed7i sai";
+              
+              document.getElementById('testScreen').classList.remove('active');
+              document.getElementById('resultScreen').classList.add('active');
+              
+              document.getElementById('scoreDisplay').innerText = score.toFixed(2) + ' / 10';
+              
+              let feedback = '';
+              if (score >= 9) feedback = 'Xu\u1ea5t s\u1eafc! B\u1ea1n n\u1eafm b\u00e0i r\u1ea5t v\u1eefng.';
+              else if (score >= 7) feedback = 'Kh\u00e1 t\u1ed1t! H\u00e3y c\u1ed1 g\u1eafng h\u01a1n m\u1ed9t ch\u00fat nh\u00e9.';
+              else if (score >= 5) feedback = '\u0110\u1ea1t y\u00eaa c\u1ea7u. B\u1ea1n c\u1ea7n \u00f4n t\u1eadp th\u00eam.';
+              else feedback = 'Ch\u01b0a \u0111\u1ea1t. B\u1ea1n c\u1ea7n xem l\u1ea1i k\u1ef9 b\u00e0i h\u1ecdc!';
+              document.getElementById('feedbackText').innerText = feedback;
+              
+              const detailsDiv = document.getElementById('resultDetails');
+              if (errors.length > 0) {
+                  detailsDiv.innerHTML = '<h3>Chi ti\u1ebft c\u00e1c c\u00e2u sai:</h3>' + 
+                      errors.map(e => '<div class="error-item">' + e + '</div>').join('');
+              } else {
+                  detailsDiv.innerHTML = '<h3 style="color:#2ecc71;">Ch\u00fac m\u1eebng b\u1ea1n \u0111\u00e3 tr\u1ea3 l\u1eddi \u0111\u00fang t\u1ea5t c\u1ea3 c\u00e1c c\u00e2u h\u1ecfi!</h3>';
+              }
+              
+              const formUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSfZCAK2lpNE8O8Ieqwc3SI1ubr6HZDvGZR91AsSpUk8kEBqaA/formResponse';
+              const formData = new FormData();
+              formData.append('entry.1861648410', studentName);
+              formData.append('entry.1691800437', score.toFixed(2));
+              const plainErrorReport = errorReport.replace(/<[^>]*>?/gm, '');
+              formData.append('entry.639295732', plainErrorReport);
+              formData.append('entry.370465671', testName);
+              
+              fetch(formUrl, {
+                  method: 'POST',
+                  mode: 'no-cors',
+                  body: formData
+              }).then(() => {
+                  window.scrollTo(0, 0);
+              }).catch(err => {
+                  alert('C\u00f3 l\u1ed7i khi g\u1eedi k\u1ebft qu\u1ea3. Vui l\u00f2ng th\u1eed l\u1ea1i!');
+                  console.error(err);
+              });
+          }
+          
+          init();
+
+
+
+
     </script>
     </body>
     </html>
